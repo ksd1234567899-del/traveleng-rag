@@ -1,0 +1,1195 @@
+[
+  {
+    "doc_id": "know_airport_1",
+    "type": "scenario_knowledge",
+    "scenario": "airport",
+    "text": "When checking in, travelers often say 'I have my luggage here' — remind them that 'luggage' is uncountable, so we say 'a piece of luggage' or 'bags,' not 'a luggage.'"
+  },
+  {
+    "doc_id": "know_airport_2",
+    "type": "scenario_knowledge",
+    "scenario": "airport",
+    "text": "A polite way to ask about seating is 'Could I get a window seat, please?' rather than 'Give me window seat.'"
+  },
+  {
+    "doc_id": "know_restaurant_1",
+    "type": "scenario_knowledge",
+    "scenario": "restaurant",
+    "text": "When ordering, natural phrasing is 'I'll have the...' or 'Could I get the...' rather than 'I want.'"
+  },
+  {
+    "doc_id": "know_restaurant_2",
+    "type": "scenario_knowledge",
+    "scenario": "restaurant",
+    "text": "Waitstaff often ask 'Are you ready to order?' — a natural learner reply is 'Yes, I'll have...' or 'Could we have a few more minutes?'"
+  },
+  {
+    "doc_id": "mistake_user_001_1",
+    "learner_id": "user_001",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-20T00:00:00.000Z",
+    "text": "Dropped-auxiliary-verb pattern: said 'I have book it yesterday' instead of 'I booked it yesterday' or 'I had booked it.'"
+  },
+  {
+    "doc_id": "mistake_user_001_2",
+    "learner_id": "user_001",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-20T00:00:00.000Z",
+    "text": "Missing article: said 'is that correct way' instead of 'is that the correct way' or 'is that right?'"
+  },
+  {
+    "doc_id": "mistake_user_001_3",
+    "learner_id": "user_001",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-20T00:00:00.000Z",
+    "text": "Misspelled 'luggage' as 'laguage' while checking in."
+  },
+  {
+    "doc_id": "utterance_user_001_1",
+    "learner_id": "user_001",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Hello, I want to check in for my flight. I have book it yesterday."
+  },
+  {
+    "doc_id": "utterance_user_001_2",
+    "learner_id": "user_001",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Yes, one suitcase please."
+  },
+  {
+    "doc_id": "utterance_user_001_3",
+    "learner_id": "user_001",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Window seat please, thank you."
+  },
+  {
+    "doc_id": "mistake_user_001_1784720357169_0",
+    "learner_id": "user_001",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-22T11:39:17.169Z",
+    "text": "have book it yesterday (instead of 'booked it yesterday')"
+  },
+  {
+    "doc_id": "utterance_user_001_1784720357497_0",
+    "learner_id": "user_001",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Hello, I have book it yesterday for my flight."
+  },
+  {
+    "doc_id": "mistake_user_999_1784720731710_0",
+    "learner_id": "user_999",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-22T11:45:31.710Z",
+    "text": "have book it (should be: booked it)"
+  },
+  {
+    "doc_id": "utterance_user_999_1784720731976_0",
+    "learner_id": "user_999",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Hello, I have book it yesterday for my flight."
+  },
+  {
+    "doc_id": "mistake_user_001_1784720751106_0",
+    "learner_id": "user_001",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-22T11:45:51.106Z",
+    "text": "have book it (instead of 'booked it' or 'made a booking')"
+  },
+  {
+    "doc_id": "utterance_user_001_1784720751411_0",
+    "learner_id": "user_001",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Hello, I have book it yesterday for my flight."
+  },
+  {
+    "doc_id": "mistake_user_001_1784720770561_0",
+    "learner_id": "user_001",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-22T11:46:10.561Z",
+    "text": "have book it yesterday (should be 'booked it yesterday')"
+  },
+  {
+    "doc_id": "utterance_user_001_1784720770871_0",
+    "learner_id": "user_001",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Hello, I have book it yesterday for my flight."
+  },
+  {
+    "doc_id": "mistake_user_001_1784720781110_0",
+    "learner_id": "user_001",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-22T11:46:21.110Z",
+    "text": "have book it (instead of 'booked it' or 'I booked it yesterday')"
+  },
+  {
+    "doc_id": "utterance_user_001_1784720781467_0",
+    "learner_id": "user_001",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Hello, I have book it yesterday for my flight."
+  },
+  {
+    "doc_id": "mistake_user_101_1784722103793_0",
+    "learner_id": "user_101",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-22T12:08:23.792Z",
+    "text": "You change my seat?"
+  },
+  {
+    "doc_id": "utterance_user_101_1784722104180_0",
+    "learner_id": "user_101",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You change my seat?"
+  },
+  {
+    "doc_id": "utterance_user_999_1784722130984_0",
+    "learner_id": "user_999",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Hello there."
+  },
+  {
+    "doc_id": "mistake_user_101_1784722873327_0",
+    "learner_id": "user_101",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-22T12:21:13.327Z",
+    "text": "You change my seat?"
+  },
+  {
+    "doc_id": "mistake_user_101_1784722873840_1",
+    "learner_id": "user_101",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-22T12:21:13.327Z",
+    "text": "You bring some water?"
+  },
+  {
+    "doc_id": "utterance_user_101_1784722874245_0",
+    "learner_id": "user_101",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You change my seat?"
+  },
+  {
+    "doc_id": "utterance_user_101_1784722874557_1",
+    "learner_id": "user_101",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You bring some water?"
+  },
+  {
+    "doc_id": "mistake_user_101_1784722924622_0",
+    "learner_id": "user_101",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-22T12:22:04.622Z",
+    "text": "You give me the boarding pass?"
+  },
+  {
+    "doc_id": "utterance_user_101_1784722925025_0",
+    "learner_id": "user_101",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You give me the boarding pass?"
+  },
+  {
+    "doc_id": "mistake_user_101_1784723006853_0",
+    "learner_id": "user_101",
+    "type": "user_mistake",
+    "scenario": "restaurant",
+    "date": "2026-07-22T12:23:26.853Z",
+    "text": "You bring the menu?"
+  },
+  {
+    "doc_id": "mistake_user_101_1784723007138_1",
+    "learner_id": "user_101",
+    "type": "user_mistake",
+    "scenario": "restaurant",
+    "date": "2026-07-22T12:23:26.853Z",
+    "text": "You give me some water?"
+  },
+  {
+    "doc_id": "utterance_user_101_1784723007468_0",
+    "learner_id": "user_101",
+    "type": "user_utterance",
+    "scenario": "restaurant",
+    "text": "You bring the menu?"
+  },
+  {
+    "doc_id": "utterance_user_101_1784723007716_1",
+    "learner_id": "user_101",
+    "type": "user_utterance",
+    "scenario": "restaurant",
+    "text": "You give me some water?"
+  },
+  {
+    "doc_id": "mistake_user_101_1784723033480_0",
+    "learner_id": "user_101",
+    "type": "user_mistake",
+    "scenario": "restaurant",
+    "date": "2026-07-22T12:23:53.480Z",
+    "text": "You bring the bill?"
+  },
+  {
+    "doc_id": "utterance_user_101_1784723033875_0",
+    "learner_id": "user_101",
+    "type": "user_utterance",
+    "scenario": "restaurant",
+    "text": "You bring the bill?"
+  },
+  {
+    "doc_id": "mistake_user_102_1784723232844_0",
+    "learner_id": "user_102",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-22T12:27:12.844Z",
+    "text": "Give me a window seat."
+  },
+  {
+    "doc_id": "mistake_user_102_1784723233361_1",
+    "learner_id": "user_102",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-22T12:27:12.844Z",
+    "text": "Give me my boarding pass."
+  },
+  {
+    "doc_id": "utterance_user_102_1784723233534_0",
+    "learner_id": "user_102",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Give me a window seat."
+  },
+  {
+    "doc_id": "utterance_user_102_1784723233813_1",
+    "learner_id": "user_102",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Give me my boarding pass."
+  },
+  {
+    "doc_id": "mistake_user_102_1784723256403_0",
+    "learner_id": "user_102",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-22T12:27:36.403Z",
+    "text": "Give me my luggage tag (should use 'Could I have my luggage tag, please?')"
+  },
+  {
+    "doc_id": "utterance_user_102_1784723256814_0",
+    "learner_id": "user_102",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Give me my luggage tag."
+  },
+  {
+    "doc_id": "mistake_user_102_1784723280459_0",
+    "learner_id": "user_102",
+    "type": "user_mistake",
+    "scenario": "restaurant",
+    "date": "2026-07-22T12:28:00.459Z",
+    "text": "Give me pizza."
+  },
+  {
+    "doc_id": "mistake_user_102_1784723280758_1",
+    "learner_id": "user_102",
+    "type": "user_mistake",
+    "scenario": "restaurant",
+    "date": "2026-07-22T12:28:00.459Z",
+    "text": "Give me the menu."
+  },
+  {
+    "doc_id": "utterance_user_102_1784723281058_0",
+    "learner_id": "user_102",
+    "type": "user_utterance",
+    "scenario": "restaurant",
+    "text": "Give me pizza."
+  },
+  {
+    "doc_id": "utterance_user_102_1784723281360_1",
+    "learner_id": "user_102",
+    "type": "user_utterance",
+    "scenario": "restaurant",
+    "text": "Give me the menu."
+  },
+  {
+    "doc_id": "mistake_user_102_1784723304833_0",
+    "learner_id": "user_102",
+    "type": "user_mistake",
+    "scenario": "restaurant",
+    "date": "2026-07-22T12:28:24.833Z",
+    "text": "Give me the bill (should be 'Could I get the bill, please?')"
+  },
+  {
+    "doc_id": "utterance_user_102_1784723305179_0",
+    "learner_id": "user_102",
+    "type": "user_utterance",
+    "scenario": "restaurant",
+    "text": "Give me the bill."
+  },
+  {
+    "doc_id": "utterance_user_103_1784723336683_0",
+    "learner_id": "user_103",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Good morning, could I please check in for my flight to Chicago?"
+  },
+  {
+    "doc_id": "utterance_user_103_1784723337013_1",
+    "learner_id": "user_103",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Could you tell me the boarding time, please?"
+  },
+  {
+    "doc_id": "utterance_user_103_1784723358388_0",
+    "learner_id": "user_103",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Good morning again — I'd like to check in. I have an early meeting after landing."
+  },
+  {
+    "doc_id": "utterance_user_103_1784723384101_0",
+    "learner_id": "user_103",
+    "type": "user_utterance",
+    "scenario": "restaurant",
+    "text": "Good evening, could I see the menu, please? I have a dinner reservation under Kim."
+  },
+  {
+    "doc_id": "utterance_user_103_1784723402935_0",
+    "learner_id": "user_103",
+    "type": "user_utterance",
+    "scenario": "restaurant",
+    "text": "Good evening — table for one again, please. I'm in town for a conference."
+  },
+  {
+    "doc_id": "mistake_user_101_1784724255104_0",
+    "learner_id": "user_101",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-22T12:44:15.104Z",
+    "text": "You bring some water? (instead of 'Could I have some water, please?')"
+  },
+  {
+    "doc_id": "utterance_user_101_1784724255307_0",
+    "learner_id": "user_101",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You bring some water?"
+  },
+  {
+    "doc_id": "utterance_user_001_1784725213565_0",
+    "learner_id": "user_001",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Hi, I have book it yesterday for my flight to Tokyo."
+  },
+  {
+    "doc_id": "utterance_user_101_1784729183996_0",
+    "learner_id": "user_101",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "I'd like a window seat, please."
+  },
+  {
+    "doc_id": "utterance_user_101_1784729184782_1",
+    "learner_id": "user_101",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Here you go."
+  },
+  {
+    "doc_id": "utterance_user_999_1784729419009_0",
+    "learner_id": "user_999",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Hello, checking in for my flight."
+  },
+  {
+    "doc_id": "utterance_user_101_1784731032003_0",
+    "learner_id": "user_101",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You bring some water?"
+  },
+  {
+    "doc_id": "mistake_test_1_1784732367382_0",
+    "learner_id": "test_1",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-22T14:59:27.382Z",
+    "text": "carry-on (not 'carrier') for hand luggage"
+  },
+  {
+    "doc_id": "mistake_test_1_1784732367791_1",
+    "learner_id": "test_1",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-22T14:59:27.382Z",
+    "text": "polite request forms: 'Could I get a window seat, please?' instead of 'i want window seat'"
+  },
+  {
+    "doc_id": "utterance_test_1_1784732368254_0",
+    "learner_id": "test_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "HI"
+  },
+  {
+    "doc_id": "utterance_test_1_1784732368685_1",
+    "learner_id": "test_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "HERE YOU ARE"
+  },
+  {
+    "doc_id": "utterance_test_1_1784732369106_2",
+    "learner_id": "test_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "YES I HAVE 2 BAGS AND ONE CARRIER"
+  },
+  {
+    "doc_id": "utterance_test_1_1784732369649_3",
+    "learner_id": "test_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "i want window seat"
+  },
+  {
+    "doc_id": "utterance_test_1_1784732369945_4",
+    "learner_id": "test_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "now plz"
+  },
+  {
+    "doc_id": "utterance_test_1_1784732370470_5",
+    "learner_id": "test_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "thx"
+  },
+  {
+    "doc_id": "utterance_user_103_1784732406103_0",
+    "learner_id": "user_103",
+    "type": "user_utterance",
+    "scenario": "restaurant",
+    "text": "Hi, table for one please."
+  },
+  {
+    "doc_id": "utterance_test_1_1784732825518_0",
+    "learner_id": "test_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "hi there"
+  },
+  {
+    "doc_id": "utterance_test_1_1784732825806_1",
+    "learner_id": "test_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "yes to tokyo. i have one suitcase "
+  },
+  {
+    "doc_id": "utterance_test_1_1784732826159_2",
+    "learner_id": "test_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "ummm well i don't know my booking number"
+  },
+  {
+    "doc_id": "utterance_test_1_1784732826429_3",
+    "learner_id": "test_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "ray"
+  },
+  {
+    "doc_id": "utterance_test_1_1784732826775_4",
+    "learner_id": "test_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "ray K"
+  },
+  {
+    "doc_id": "utterance_test_1_1784732827175_5",
+    "learner_id": "test_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "KIM"
+  },
+  {
+    "doc_id": "utterance_test_1_1784732827584_6",
+    "learner_id": "test_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "i have one suitcase AND a small bag"
+  },
+  {
+    "doc_id": "utterance_test_1_1784732827882_7",
+    "learner_id": "test_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "yes plz"
+  },
+  {
+    "doc_id": "utterance_test_1_1784732828201_8",
+    "learner_id": "test_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "a window plz"
+  },
+  {
+    "doc_id": "utterance_test_1_1784732828682_9",
+    "learner_id": "test_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Could I get a window seat, please?"
+  },
+  {
+    "doc_id": "utterance_test_1_1784732829007_10",
+    "learner_id": "test_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "yup"
+  },
+  {
+    "doc_id": "mistake_test_2_1784733582672_0",
+    "learner_id": "test_2",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-22T15:19:42.672Z",
+    "text": "'I have book it' instead of 'I booked it' (misuse of present perfect / wrong past tense form with a specific past time reference)"
+  },
+  {
+    "doc_id": "mistake_test_2_1784733583388_1",
+    "learner_id": "test_2",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-22T15:19:42.672Z",
+    "text": "'You bring me the boarding pass?' instead of 'Could you give me my boarding pass?' (missing modal for polite requests)"
+  },
+  {
+    "doc_id": "utterance_test_2_1784733583824_0",
+    "learner_id": "test_2",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "I have book it yesterday"
+  },
+  {
+    "doc_id": "utterance_test_2_1784733584187_1",
+    "learner_id": "test_2",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You bring me the boarding pass?"
+  },
+  {
+    "doc_id": "utterance_user_101_1784734576005_0",
+    "learner_id": "user_101",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You bring me the boarding pass?"
+  },
+  {
+    "doc_id": "utterance_user_101_1784734576386_1",
+    "learner_id": "user_101",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Could you give me the boarding pass, please?"
+  },
+  {
+    "doc_id": "mistake_verify_tutor_split5_1784776772371_0",
+    "learner_id": "verify_tutor_split5",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-23T03:19:32.371Z",
+    "text": "using imperative/statement form instead of a polite question when making requests (e.g. 'You bring me...' instead of 'Could you give me...?')"
+  },
+  {
+    "doc_id": "utterance_verify_tutor_split5_1784776772701_0",
+    "learner_id": "verify_tutor_split5",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You bring me the boarding pass?"
+  },
+  {
+    "doc_id": "utterance_verify_tutor_split5_1784776773059_1",
+    "learner_id": "verify_tutor_split5",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Could you give me the boarding pass, please?"
+  },
+  {
+    "doc_id": "utterance_verify_tutor_split5_1784776773356_2",
+    "learner_id": "verify_tutor_split5",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "I have two bags to check in, please."
+  },
+  {
+    "doc_id": "utterance_test_2_1784777516662_0",
+    "learner_id": "test_2",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You bring me the boarding pass?"
+  },
+  {
+    "doc_id": "mistake_verify_fixes_1_1784777802243_0",
+    "learner_id": "verify_fixes_1",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-23T03:36:42.243Z",
+    "text": "using 'you bring me...' instead of polite request forms like 'Could you give me...' or 'Can I get...'"
+  },
+  {
+    "doc_id": "utterance_verify_fixes_1_1784777802880_0",
+    "learner_id": "verify_fixes_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You bring me the boarding pass?"
+  },
+  {
+    "doc_id": "utterance_verify_fixes_1_1784777803254_1",
+    "learner_id": "verify_fixes_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Could you give me the boarding pass, please?"
+  },
+  {
+    "doc_id": "utterance_verify_fixes_1_1784777803682_2",
+    "learner_id": "verify_fixes_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "I have two bags to check in, please."
+  },
+  {
+    "doc_id": "mistake_test_2_1784778077388_0",
+    "learner_id": "test_2",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-23T03:41:17.388Z",
+    "text": "'travel agent i did' instead of 'I booked it through a travel agent' (incorrect word order / subject-verb inversion in a declarative sentence)"
+  },
+  {
+    "doc_id": "mistake_test_2_1784778077844_1",
+    "learner_id": "test_2",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-23T03:41:17.388Z",
+    "text": "'have i big bag' instead of 'I have a big bag' (incorrect subject-verb order and missing article)"
+  },
+  {
+    "doc_id": "utterance_test_2_1784778078234_0",
+    "learner_id": "test_2",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "yes "
+  },
+  {
+    "doc_id": "utterance_test_2_1784778078530_1",
+    "learner_id": "test_2",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "here "
+  },
+  {
+    "doc_id": "utterance_test_2_1784778078812_2",
+    "learner_id": "test_2",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "travel agent i did"
+  },
+  {
+    "doc_id": "utterance_test_2_1784778079172_3",
+    "learner_id": "test_2",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "have i big bag"
+  },
+  {
+    "doc_id": "utterance_test_2_1784778079572_4",
+    "learner_id": "test_2",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "i have a big bag"
+  },
+  {
+    "doc_id": "utterance_test_2_1784778079850_5",
+    "learner_id": "test_2",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "window seat"
+  },
+  {
+    "doc_id": "utterance_test_2_1784778080202_6",
+    "learner_id": "test_2",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "thx"
+  },
+  {
+    "doc_id": "mistake_verify_fixes_2_1784779432347_0",
+    "learner_id": "verify_fixes_2",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-23T04:03:52.346Z",
+    "text": "forming questions with auxiliary verbs (e.g. 'You bring me...' instead of 'Could you give me...')"
+  },
+  {
+    "doc_id": "mistake_verify_fixes_2_1784779432723_1",
+    "learner_id": "verify_fixes_2",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-23T04:03:52.346Z",
+    "text": "responding naturally to situational prompts instead of switching topics (e.g. ignoring the passport request and jumping to luggage)"
+  },
+  {
+    "doc_id": "utterance_verify_fixes_2_1784779433049_0",
+    "learner_id": "verify_fixes_2",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You bring me the boarding pass?"
+  },
+  {
+    "doc_id": "utterance_verify_fixes_2_1784779433323_1",
+    "learner_id": "verify_fixes_2",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Could you give me the boarding pass, please?"
+  },
+  {
+    "doc_id": "utterance_verify_fixes_2_1784779433606_2",
+    "learner_id": "verify_fixes_2",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "here"
+  },
+  {
+    "doc_id": "utterance_verify_fixes_2_1784779433912_3",
+    "learner_id": "verify_fixes_2",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "I have two bags to check in, please."
+  },
+  {
+    "doc_id": "utterance_verify_fixes_3_1784779502412_0",
+    "learner_id": "verify_fixes_3",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "I'm flying to Tokyo today."
+  },
+  {
+    "doc_id": "utterance_verify_fixes_3_1784779502941_1",
+    "learner_id": "verify_fixes_3",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Here is my passport, sorry it took me a moment to find it in my bag."
+  },
+  {
+    "doc_id": "mistake_test_4_1784779952536_0",
+    "learner_id": "test_4",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-23T04:12:32.536Z",
+    "text": "using complete sentences instead of one-word answers (e.g. saying 'to london' or 'window' instead of full sentences)"
+  },
+  {
+    "doc_id": "mistake_test_4_1784779952846_1",
+    "learner_id": "test_4",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-23T04:12:32.536Z",
+    "text": "inverted or incorrect word order in sentences (e.g. 'two bag i have' instead of 'I have two bags')"
+  },
+  {
+    "doc_id": "utterance_test_4_1784779953180_0",
+    "learner_id": "test_4",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "to london"
+  },
+  {
+    "doc_id": "utterance_test_4_1784779953593_1",
+    "learner_id": "test_4",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "I'm flying to London"
+  },
+  {
+    "doc_id": "utterance_test_4_1784779953922_2",
+    "learner_id": "test_4",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "ok"
+  },
+  {
+    "doc_id": "utterance_test_4_1784779954305_3",
+    "learner_id": "test_4",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Sure, just a moment — I'm looking for my passport."
+  },
+  {
+    "doc_id": "utterance_test_4_1784779954603_4",
+    "learner_id": "test_4",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "here"
+  },
+  {
+    "doc_id": "utterance_test_4_1784779955052_5",
+    "learner_id": "test_4",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "sorry"
+  },
+  {
+    "doc_id": "utterance_test_4_1784779955543_6",
+    "learner_id": "test_4",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "two bag i have"
+  },
+  {
+    "doc_id": "utterance_test_4_1784779956267_7",
+    "learner_id": "test_4",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "I have two bags to check in."
+  },
+  {
+    "doc_id": "utterance_test_4_1784779956743_8",
+    "learner_id": "test_4",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "window"
+  },
+  {
+    "doc_id": "utterance_test_4_1784779957272_9",
+    "learner_id": "test_4",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Could I get a window seat, please?"
+  },
+  {
+    "doc_id": "mistake_verify_dyn_1_1784781684557_0",
+    "learner_id": "verify_dyn_1",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-23T04:41:24.557Z",
+    "text": "Stating incorrect or unrelated information when a specific detail is expected (e.g., wrong destination)"
+  },
+  {
+    "doc_id": "mistake_verify_dyn_1_1784781684988_1",
+    "learner_id": "verify_dyn_1",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-23T04:41:24.557Z",
+    "text": "Skipping explanation of a situation instead of describing it naturally (e.g., not explaining why passport is delayed)"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_1_1784781685311_0",
+    "learner_id": "verify_dyn_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "I'm flying to Tokyo today."
+  },
+  {
+    "doc_id": "utterance_verify_dyn_1_1784781685631_1",
+    "learner_id": "verify_dyn_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "I have one suitcase to check in, please."
+  },
+  {
+    "doc_id": "utterance_verify_dyn_1_1784781685946_2",
+    "learner_id": "verify_dyn_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Could I have a window seat, please?"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_1_1784781686244_3",
+    "learner_id": "verify_dyn_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Yes, that's everything, thank you."
+  },
+  {
+    "doc_id": "utterance_verify_dyn_1_1784781686552_4",
+    "learner_id": "verify_dyn_1",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Sorry, it's taking a moment to find it in my bag."
+  },
+  {
+    "doc_id": "mistake_verify_dyn_4_1784781797515_0",
+    "learner_id": "verify_dyn_4",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-23T04:43:17.515Z",
+    "text": "Responding to direct questions with generic affirmations instead of relevant answers (e.g., saying 'Sure, no problem at all' when asked how many bags to check in)"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_4_1784781797846_0",
+    "learner_id": "verify_dyn_4",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Good morning! Yes, I'm ready."
+  },
+  {
+    "doc_id": "utterance_verify_dyn_4_1784781798126_1",
+    "learner_id": "verify_dyn_4",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Sure, here you go."
+  },
+  {
+    "doc_id": "utterance_verify_dyn_4_1784781798386_2",
+    "learner_id": "verify_dyn_4",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "That sounds good to me, thank you."
+  },
+  {
+    "doc_id": "utterance_verify_dyn_4_1784781798665_3",
+    "learner_id": "verify_dyn_4",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Sure, no problem at all."
+  },
+  {
+    "doc_id": "utterance_verify_dyn_4_1784781798944_4",
+    "learner_id": "verify_dyn_4",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Great, thank you so much!"
+  },
+  {
+    "doc_id": "mistake_verify_dyn_5_1784781960701_0",
+    "learner_id": "verify_dyn_5",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-23T04:46:00.701Z",
+    "text": "Using direct/bare verb forms for requests instead of polite modal forms (e.g. 'You bring me...' / 'You give me...' instead of 'Could you..., please?')"
+  },
+  {
+    "doc_id": "mistake_verify_dyn_5_1784781961353_1",
+    "learner_id": "verify_dyn_5",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-23T04:46:00.701Z",
+    "text": "Not responding to the question asked (e.g. saying 'Thank you' instead of answering 'Where are you flying to?')"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_5_1784781961689_0",
+    "learner_id": "verify_dyn_5",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You bring me the boarding pass?"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_5_1784781962028_1",
+    "learner_id": "verify_dyn_5",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Could you give me the boarding pass, please?"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_5_1784781962313_2",
+    "learner_id": "verify_dyn_5",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You give me some water?"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_5_1784781962631_3",
+    "learner_id": "verify_dyn_5",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Could you give me some water, please?"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_5_1784781963027_4",
+    "learner_id": "verify_dyn_5",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "here"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_5_1784781963366_5",
+    "learner_id": "verify_dyn_5",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Sorry, it's taking a moment to find it."
+  },
+  {
+    "doc_id": "utterance_verify_dyn_5_1784781963656_6",
+    "learner_id": "verify_dyn_5",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "thx"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_5_1784781964013_7",
+    "learner_id": "verify_dyn_5",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Thank you very much."
+  },
+  {
+    "doc_id": "mistake_verify_dyn_6_1784782117295_0",
+    "learner_id": "verify_dyn_6",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-23T04:48:37.295Z",
+    "text": "Incorrect word order / subject-verb inversion in requests (e.g. 'You bring me...' instead of 'Could you...')"
+  },
+  {
+    "doc_id": "mistake_verify_dyn_6_1784782117826_1",
+    "learner_id": "verify_dyn_6",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-23T04:48:37.295Z",
+    "text": "Jumping to requesting result (boarding pass) without first initiating the process (checking in)"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_6_1784782118137_0",
+    "learner_id": "verify_dyn_6",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You bring me the boarding pass?"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_6_1784782118430_1",
+    "learner_id": "verify_dyn_6",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Could you give me the boarding pass, please?"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_6_1784782225824_0",
+    "learner_id": "verify_dyn_6",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You give me some water?"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_6_1784782226197_1",
+    "learner_id": "verify_dyn_6",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Could you give me some water, please?"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_6_1784782226546_2",
+    "learner_id": "verify_dyn_6",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You bring me my bag?"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_6_1784782226877_3",
+    "learner_id": "verify_dyn_6",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Could you bring me my bag, please?"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_6_1784782227214_4",
+    "learner_id": "verify_dyn_6",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "here"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_6_1784782227686_5",
+    "learner_id": "verify_dyn_6",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Sorry, it's taking a moment to find."
+  },
+  {
+    "doc_id": "mistake_verify_dyn_6_1784782329784_0",
+    "learner_id": "verify_dyn_6",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-23T04:52:09.784Z",
+    "text": "Using incomplete or informal responses (e.g., 'here', 'thx') instead of full sentences in conversation"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_6_1784782330143_0",
+    "learner_id": "verify_dyn_6",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You give me the boarding pass?"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_6_1784782330326_1",
+    "learner_id": "verify_dyn_6",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Could you give me the boarding pass, please?"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_6_1784782330629_2",
+    "learner_id": "verify_dyn_6",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "You bring me my passport back?"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_6_1784782330951_3",
+    "learner_id": "verify_dyn_6",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Could you bring me my passport back, please?"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_6_1784782331234_4",
+    "learner_id": "verify_dyn_6",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "here"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_6_1784782331565_5",
+    "learner_id": "verify_dyn_6",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Sorry, one moment please."
+  },
+  {
+    "doc_id": "utterance_verify_dyn_6_1784782331882_6",
+    "learner_id": "verify_dyn_6",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "thx"
+  },
+  {
+    "doc_id": "utterance_verify_dyn_6_1784782332199_7",
+    "learner_id": "verify_dyn_6",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Thank you very much."
+  }
+]

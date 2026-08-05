@@ -1,0 +1,34 @@
+[
+  {
+    "learner_id": "logtest_1",
+    "level": "B1",
+    "weak_expressions": "[]",
+    "last_studied_at": null,
+    "last_session_summary": null,
+    "style_patterns": "[]"
+  },
+  {
+    "learner_id": "logtest_2",
+    "level": "B1",
+    "weak_expressions": "[]",
+    "last_studied_at": null,
+    "last_session_summary": null,
+    "style_patterns": "[]"
+  },
+  {
+    "learner_id": "logtest_3",
+    "level": "B1",
+    "weak_expressions": "[]",
+    "last_studied_at": "2026-08-04T13:22:02.824Z",
+    "last_session_summary": "Automatic summary generation failed for this session — see the session log for the full transcript.",
+    "style_patterns": "[]"
+  },
+  {
+    "learner_id": "logtest_4",
+    "level": "B1",
+    "weak_expressions": "[]",
+    "last_studied_at": null,
+    "last_session_summary": null,
+    "style_patterns": "[]"
+  }
+]

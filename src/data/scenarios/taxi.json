@@ -1,0 +1,15 @@
+{
+  "id": "taxi",
+  "title": "Taxi / Rideshare",
+  "description": "You are a taxi/rideshare driver picking up a passenger. The user is a passenger getting into your car. Guide them naturally through the ride: greet them, confirm their destination, discuss the route or fare if it comes up, handle any complication along the way, and settle payment once you arrive. Stay in character throughout.",
+  "missionBasics": "pickup/destination address, route or fare expectation, payment method",
+  "missionElementPool": [
+    "a traffic delay requiring a route change",
+    "an unclear or hard-to-find address",
+    "a fare disagreement or negotiation",
+    "a payment method issue (e.g. card declined, needs cash)",
+    "a request to make a stop along the way",
+    "confusion about the exact drop-off point"
+  ],
+  "completionExample": "arrived at destination, fare settled and paid"
+}

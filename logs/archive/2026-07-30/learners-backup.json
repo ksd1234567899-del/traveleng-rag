@@ -1,0 +1,92 @@
+[
+  {
+    "learner_id": "dev_1",
+    "level": "A2",
+    "interests": "[]",
+    "travel_purpose": "general travel",
+    "weak_expressions": "[{\"pattern\":\"Using single words or fragments instead of full sentences (e.g., 'HERE', 'ok', 'window', 'i pay')\",\"count\":4},{\"pattern\":\"Missing auxiliary verb in future tense (e.g., 'i pay' instead of 'I'll pay')\",\"count\":1},{\"pattern\":\"Incorrect article use before consonant sounds (e.g., 'an window' instead of 'a window')\",\"count\":1}]",
+    "last_studied_at": "2026-07-23T08:00:05.113Z",
+    "last_session_summary": "The learner practiced an airport check-in scenario, successfully conveying most information including checking in a bag and traveling with a dog in the cabin. Minor issues included using 'ANYWAY' as an abrupt topic-changer and a small article error ('an window')."
+  },
+  {
+    "learner_id": "prof",
+    "level": "B1",
+    "interests": "[]",
+    "travel_purpose": "general travel",
+    "weak_expressions": "[{\"pattern\":\"Using informal/incomplete responses (e.g., 'ok', 'o', 'thx') instead of full English sentences in a formal context\",\"count\":1},{\"pattern\":\"Starting with a destination statement instead of a proper check-in phrase (e.g., 'I will go to Paris' instead of 'I'm checking in for my flight to Paris')\",\"count\":1}]",
+    "last_studied_at": "2026-07-27T02:40:36.821Z",
+    "last_session_summary": "The learner practiced an airport check-in scenario for a flight to Paris, covering luggage, seat preference, traveling with a child, and bringing a small dog into the cabin. The learner struggled with natural English phrasing at first but improved with tutor guidance throughout the session."
+  },
+  {
+    "learner_id": "smoke_test_restaurant",
+    "level": "B1",
+    "interests": "[]",
+    "travel_purpose": "general travel",
+    "weak_expressions": "[]",
+    "last_studied_at": "2026-07-30T05:36:15.897Z",
+    "last_session_summary": "Automatic summary generation failed for this session — see the session log for the full transcript."
+  },
+  {
+    "learner_id": "smoke_test_restaurant2",
+    "level": "B1",
+    "interests": "[]",
+    "travel_purpose": "general travel",
+    "weak_expressions": "[{\"pattern\":\"Failing to proactively state allergy/dietary restrictions clearly at the start (e.g., omitting 'I have a shrimp allergy')\",\"count\":1},{\"pattern\":\"Skipping requested scenario steps (e.g., not asking for a window seat, not addressing a missing menu item)\",\"count\":1}]",
+    "last_studied_at": "2026-07-30T05:37:49.412Z",
+    "last_session_summary": "The learner practiced a restaurant scenario but skipped key steps like requesting a window seat, clearly stating their shrimp allergy upfront, and resolving a missing order item. The tutor prompted them to use more specific allergy language."
+  },
+  {
+    "learner_id": "smoke_test_airport",
+    "level": "B1",
+    "interests": "[]",
+    "travel_purpose": "general travel",
+    "weak_expressions": "[]",
+    "last_studied_at": "2026-07-30T05:39:11.917Z",
+    "last_session_summary": "Automatic summary generation failed for this session — see the session log for the full transcript."
+  },
+  {
+    "learner_id": "dev_restaurant1",
+    "level": "B1",
+    "interests": "[]",
+    "travel_purpose": "general travel",
+    "weak_expressions": "[{\"pattern\":\"Using incomplete/fragmented responses instead of full sentences (e.g., 'window plz', 'cream to tomato plz', 'th')\",\"count\":1},{\"pattern\":\"Using plural 'allergies' instead of singular 'allergy' for a single food allergy\",\"count\":1},{\"pattern\":\"Not asserting a complaint or correction when food/service is wrong (e.g., saying 'that's okay' instead of explaining the mistake)\",\"count\":1}]",
+    "last_studied_at": "2026-07-30T05:46:29.699Z",
+    "last_session_summary": "The learner practiced a restaurant visit scenario in English, covering seating preferences, allergy disclosure, ordering with sauce modifications, and handling a wrong order. The tutor guided the learner to use complete sentences throughout the session."
+  },
+  {
+    "learner_id": "dev_restaurant2",
+    "level": "B1",
+    "interests": "[]",
+    "travel_purpose": "general travel",
+    "weak_expressions": "[{\"pattern\":\"Using plural form for uncountable/singular nouns (e.g., 'allergies' instead of 'allergy')\",\"count\":1},{\"pattern\":\"Using informal/incomplete phrasing instead of polite full sentences (e.g., 'i get that one' instead of 'I'll have that one, please')\",\"count\":1}]",
+    "last_studied_at": "2026-07-30T05:55:13.352Z",
+    "last_session_summary": "The learner practiced a restaurant scenario in English, covering seating preferences, allergy disclosure, ordering food, handling a sold-out item, and flagging a missing item. Overall communication was successful with minor grammatical and spelling issues."
+  },
+  {
+    "learner_id": "smoke_test_retry_refactor",
+    "level": "B1",
+    "interests": "[]",
+    "travel_purpose": "general travel",
+    "weak_expressions": "[]",
+    "last_studied_at": null,
+    "last_session_summary": null
+  },
+  {
+    "learner_id": "smoke_test_retry_refactor2",
+    "level": "B1",
+    "interests": "[]",
+    "travel_purpose": "general travel",
+    "weak_expressions": "[]",
+    "last_studied_at": "2026-07-30T06:31:00.709Z",
+    "last_session_summary": "The learner greeted the tutor but no actual English practice conversation took place in this session."
+  },
+  {
+    "learner_id": "smoke_test_hotel",
+    "level": "B1",
+    "interests": "[]",
+    "travel_purpose": "general travel",
+    "weak_expressions": "[]",
+    "last_studied_at": "2026-07-30T06:58:21.615Z",
+    "last_session_summary": "Automatic summary generation failed for this session — see the session log for the full transcript."
+  }
+]

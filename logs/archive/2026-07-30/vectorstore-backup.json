@@ -1,0 +1,107 @@
+[
+  {
+    "doc_id": "know_airport_1",
+    "type": "scenario_knowledge",
+    "scenario": "airport",
+    "text": "When checking in, travelers often say 'I have my luggage here' — remind them that 'luggage' is uncountable, so we say 'a piece of luggage' or 'bags,' not 'a luggage.'"
+  },
+  {
+    "doc_id": "know_airport_2",
+    "type": "scenario_knowledge",
+    "scenario": "airport",
+    "text": "A polite way to ask about seating is 'Could I get a window seat, please?' rather than 'Give me window seat.'"
+  },
+  {
+    "doc_id": "know_restaurant_1",
+    "type": "scenario_knowledge",
+    "scenario": "restaurant",
+    "text": "When ordering, natural phrasing is 'I'll have the...' or 'Could I get the...' rather than 'I want.'"
+  },
+  {
+    "doc_id": "know_restaurant_2",
+    "type": "scenario_knowledge",
+    "scenario": "restaurant",
+    "text": "Waitstaff often ask 'Are you ready to order?' — a natural learner reply is 'Yes, I'll have...' or 'Could we have a few more minutes?'"
+  },
+  {
+    "doc_id": "know_hotel_1",
+    "type": "scenario_knowledge",
+    "scenario": "hotel",
+    "text": "When checking in, a natural way to confirm a reservation is 'I have a reservation under the name...' rather than 'I book a room.'"
+  },
+  {
+    "doc_id": "know_hotel_2",
+    "type": "scenario_knowledge",
+    "scenario": "hotel",
+    "text": "To ask about a later check-out politely: 'Could I get a late check-out, if possible?' rather than 'I want late check-out.'"
+  },
+  {
+    "doc_id": "know_taxi_1",
+    "type": "scenario_knowledge",
+    "scenario": "taxi",
+    "text": "A natural way to state a destination is 'Could you take me to...?' or 'I'm heading to...' rather than 'I want go to...'"
+  },
+  {
+    "doc_id": "know_taxi_2",
+    "type": "scenario_knowledge",
+    "scenario": "taxi",
+    "text": "To ask about the fare naturally: 'About how much will it cost to get there?' rather than 'How much money?'"
+  },
+  {
+    "doc_id": "know_tourist_info_1",
+    "type": "scenario_knowledge",
+    "scenario": "tourist_info",
+    "text": "A natural way to ask for a recommendation is 'Could you recommend a good place for...?' rather than 'Tell me good place.'"
+  },
+  {
+    "doc_id": "know_tourist_info_2",
+    "type": "scenario_knowledge",
+    "scenario": "tourist_info",
+    "text": "When asking for directions, a natural phrase is 'Could you tell me how to get there?' or 'Is it within walking distance?' rather than 'Where is it, tell me way.'"
+  },
+  {
+    "doc_id": "mistake_user_001_1",
+    "learner_id": "user_001",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-20T00:00:00.000Z",
+    "text": "Dropped-auxiliary-verb pattern: said 'I have book it yesterday' instead of 'I booked it yesterday' or 'I had booked it.'"
+  },
+  {
+    "doc_id": "mistake_user_001_2",
+    "learner_id": "user_001",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-20T00:00:00.000Z",
+    "text": "Missing article: said 'is that correct way' instead of 'is that the correct way' or 'is that right?'"
+  },
+  {
+    "doc_id": "mistake_user_001_3",
+    "learner_id": "user_001",
+    "type": "user_mistake",
+    "scenario": "airport",
+    "date": "2026-07-20T00:00:00.000Z",
+    "text": "Misspelled 'luggage' as 'laguage' while checking in."
+  },
+  {
+    "doc_id": "utterance_user_001_1",
+    "learner_id": "user_001",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Hello, I want to check in for my flight. I have book it yesterday."
+  },
+  {
+    "doc_id": "utterance_user_001_2",
+    "learner_id": "user_001",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Yes, one suitcase please."
+  },
+  {
+    "doc_id": "utterance_user_001_3",
+    "learner_id": "user_001",
+    "type": "user_utterance",
+    "scenario": "airport",
+    "text": "Window seat please, thank you."
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "id": "airport",
+  "title": "Airport Check-in",
+  "description": "You are an airline check-in staff member at the departure counter. The user is a traveler checking in for their flight. Guide them naturally through check-in: greet them, ask for their passport and booking reference, confirm their luggage, ask about seat preference (window or aisle), and hand over the boarding pass. Stay in character throughout.",
+  "missionBasics": "destination, bag(s), seat preference",
+  "missionElementPool": [
+    "traveling with a pet",
+    "traveling with a young child",
+    "a special meal/dietary request",
+    "overweight or oversized baggage",
+    "a tight connecting flight",
+    "a minor booking discrepancy (e.g. wrong date, misspelled name)",
+    "a misplaced or hard-to-find travel document"
+  ],
+  "completionExample": "boarding pass issued, bags checked, situation fully resolved"
+}

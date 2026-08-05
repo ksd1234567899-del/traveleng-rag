@@ -1,0 +1,14 @@
+
+[retrieval debug] --- turn for learner_id=verify_15, scenario=airport ---
+[retrieval debug] user_mistake (learner_id=verify_15): [
+  {
+    id: 'mistake_verify_15_A',
+    text: "Drops the subject 'I' at the start of a sentence (e.g. says 'Have one bag' instead of 'I have one bag')"
+  },
+  {
+    id: 'mistake_verify_15_B',
+    text: "Confuses 'a'/'an' before a following vowel sound"
+  }
+]
+[retrieval debug] user_utterance (learner_id=verify_15): (none)
+[retrieval debug] scenario_knowledge (learner_id=verify_15): (none)

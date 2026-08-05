@@ -1,0 +1,83 @@
+[
+  {
+    "learner_id": "user_001",
+    "level": "B1",
+    "interests": "[]",
+    "travel_purpose": "general travel",
+    "weak_expressions": "[\"I have book it (should be 'I booked it' or 'I had booked it')\",\"is that correct way (missing article: 'is that the correct way')\",\"is that correct way (alternative: 'is that right?')\",\"checking in please\",\"have book it yesterday (instead of 'booked it yesterday')\",\"have book it (instead of 'booked it' or 'made a booking')\",\"have book it yesterday (should be 'booked it yesterday')\",\"have book it (instead of 'booked it' or 'I booked it yesterday')\"]",
+    "last_studied_at": "2026-07-22T13:00:13.547Z",
+    "last_session_summary": "The learner attempted to check in for a flight to Tokyo, using an incorrect verb form when referencing their booking. The tutor corrected the mistake and requested travel documents."
+  },
+  {
+    "learner_id": "user_999",
+    "level": "B1",
+    "interests": "[]",
+    "travel_purpose": "general travel",
+    "weak_expressions": "[\"have book it (should be: booked it)\"]",
+    "last_studied_at": "2026-07-22T14:10:18.994Z",
+    "last_session_summary": "The learner began a roleplay session practicing airport check-in English, saying only one opening line before the conversation ended."
+  },
+  {
+    "learner_id": "user_888",
+    "level": "B1",
+    "interests": "[]",
+    "travel_purpose": "general travel",
+    "weak_expressions": "[]",
+    "last_studied_at": null,
+    "last_session_summary": null
+  },
+  {
+    "learner_id": "user_101",
+    "level": "B1",
+    "interests": "[\"food\",\"solo travel\"]",
+    "travel_purpose": "leisure",
+    "weak_expressions": "[\"You change my seat?\",\"You bring some water?\",\"You give me the boarding pass?\",\"You bring the menu?\",\"You give me some water?\",\"You bring the bill?\",\"You bring some water? (instead of 'Could I have some water, please?')\"]",
+    "last_studied_at": "2026-07-22T15:36:15.984Z",
+    "last_session_summary": "The learner practiced a check-in scenario for a flight to London. They initially used an unnatural request form ('You bring me the boarding pass?') but quickly corrected it to 'Could you give me the boarding pass, please?' after the tutor's guidance."
+  },
+  {
+    "learner_id": "user_102",
+    "level": "A2",
+    "interests": "[\"photography\",\"sightseeing\"]",
+    "travel_purpose": "leisure",
+    "weak_expressions": "[\"Give me a window seat.\",\"Give me my boarding pass.\",\"Give me my luggage tag (should use 'Could I have my luggage tag, please?')\",\"Give me pizza.\",\"Give me the menu.\",\"Give me the bill (should be 'Could I get the bill, please?')\"]",
+    "last_studied_at": "2026-07-22T14:58:13.241Z",
+    "last_session_summary": "The learner practiced an airport check-in scenario but struggled to follow the conversation flow, responding with pre-prepared information instead of answering the staff's specific questions (e.g., not presenting the passport when asked). No significant new grammar or phrasing mistakes were observed."
+  },
+  {
+    "learner_id": "user_103",
+    "level": "B2",
+    "interests": "[]",
+    "travel_purpose": "business",
+    "weak_expressions": "[\"responding to questions with unrelated statements (not listening/responding to what was asked)\",\"forgetting to mention two bags when checking in ('I have one suitcase' instead of 'I have two bags to check')\",\"requesting wrong seat type ('window seat' instead of 'aisle seat')\"]",
+    "last_studied_at": "2026-07-22T15:00:06.088Z",
+    "last_session_summary": "The learner practiced a restaurant arrival scenario, successfully requesting a table for one. The session was very brief, covering only the initial greeting and seating."
+  },
+  {
+    "learner_id": "test_1",
+    "level": "B1",
+    "interests": "[]",
+    "travel_purpose": "general travel",
+    "weak_expressions": "[\"carry-on (not 'carrier') for hand luggage\",\"polite request forms: 'Could I get a window seat, please?' instead of 'i want window seat'\"]",
+    "last_studied_at": "2026-07-22T15:07:05.504Z",
+    "last_session_summary": "The learner practiced a flight check-in scenario to Tokyo, successfully providing their name when they forgot their booking reference and learning to use polite full-sentence request forms. The session went smoothly with good engagement."
+  },
+  {
+    "learner_id": "test_2",
+    "level": "B1",
+    "interests": "[]",
+    "travel_purpose": "general travel",
+    "weak_expressions": "[\"'I have book it' instead of 'I booked it' (misuse of present perfect / wrong past tense form with a specific past time reference)\",\"'You bring me the boarding pass?' instead of 'Could you give me my boarding pass?' (missing modal for polite requests)\",\"'travel agent i did' instead of 'I booked it through a travel agent' (incorrect word order / subject-verb inversion in a declarative sentence)\",\"'have i big bag' instead of 'I have a big bag' (incorrect subject-verb order and missing article)\"]",
+    "last_studied_at": "2026-07-23T03:41:17.376Z",
+    "last_session_summary": "The learner practiced an airport check-in scenario, responding to questions about their passport, booking, luggage, and seat preference. The session was short with mostly minimal responses, but the learner successfully self-corrected their sentence about luggage after tutor guidance."
+  },
+  {
+    "learner_id": "test_4",
+    "level": "B1",
+    "interests": "[]",
+    "travel_purpose": "general travel",
+    "weak_expressions": "[\"using complete sentences instead of one-word answers (e.g. saying 'to london' or 'window' instead of full sentences)\",\"inverted or incorrect word order in sentences (e.g. 'two bag i have' instead of 'I have two bags')\"]",
+    "last_studied_at": "2026-07-23T04:12:32.518Z",
+    "last_session_summary": "The learner practiced an airport check-in scenario for a flight to London, working on forming complete sentences instead of single-word or fragmented responses, and using polite request forms."
+  }
+]
