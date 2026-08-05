@@ -11,7 +11,7 @@
     "server": "tsx src/api/server.ts",
     "seed": "tsx src/scripts/seed.ts",
     "inspect": "tsx src/scripts/inspectVectorStore.ts",
-    "build": "tsc",
+    "build": "tsc && node scripts/copy-assets.js",
     "start": "node dist/api/chat.js",
     "start:server": "node dist/api/server.js"
   },
