@@ -102,6 +102,7 @@ export interface OpeningResult {
 }
 
 export interface MessageTurnResult {
+  turnNumber: number; // 1-indexed; matches ChatSession.totalNormalTurns at the time this turn was processed
   staffLine: string | null;
   tutorLine: string | null;
   styleNote: string | null;
@@ -126,7 +127,7 @@ export interface SessionReportPayload {
   totalComplexAttempts: number;
   totalDetectionFailures: number;
   missionChecklist: MissionChecklistItem[];
-  corrections: { wrong: string; fixed: string }[];
+  corrections: { wrong: string; fixed: string; turnNumber: number }[];
   checklistNotes: { id: string; note_ko: string }[];
   focusSuggestions: string[];
   reportText: string;
@@ -154,7 +155,7 @@ export class ChatSession {
   private readonly messages: Anthropic.MessageParam[] = [];
 
   private readonly missionChecklist: MissionChecklistItem[] = [];
-  private readonly sessionCorrections: { wrong: string; fixed: string }[] = [];
+  private readonly sessionCorrections: { wrong: string; fixed: string; turnNumber: number }[] = [];
   // Mirrors the assistant/user turns in this.messages, but keeps each turn's
   // distinct speakers (Mission briefing / Tutor(KO) / Staff) as separate
   // labeled segments instead of the single pre-merged string this.messages
@@ -293,6 +294,7 @@ export class ChatSession {
       this.sessionCorrections.push({
         wrong: detection.original_phrase as string,
         fixed: detection.corrected_phrase as string,
+        turnNumber: this.totalNormalTurns,
       });
       tutorLine = detection.tutor_line;
     } else if (detection.style_pattern_note && !this.styleNoteShownThisSession) {
@@ -334,6 +336,7 @@ export class ChatSession {
     });
 
     return this.finishTurn({
+      turnNumber: this.totalNormalTurns,
       staffLine: staffResp.staff_line,
       tutorLine,
       styleNote,

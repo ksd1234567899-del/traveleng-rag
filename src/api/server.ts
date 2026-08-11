@@ -132,6 +132,7 @@ app.post("/session/message", async (req: Request, res: Response) => {
     const result = await entry.session.sendMessage(message);
     res.json({
       kind: "scenario",
+      turnNumber: result.turnNumber,
       staffLine: result.staffLine,
       tutorLine: result.tutorLine,
       styleNote: result.styleNote,
