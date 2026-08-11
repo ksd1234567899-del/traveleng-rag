@@ -91,6 +91,8 @@ interface OpeningResponse {
 interface SessionReportResponse {
   checklist_notes: { id: string; note_ko: string }[];
   focus_suggestions: string[];
+  today_summary: string;
+  next_goal: string;
 }
 
 export interface OpeningResult {
@@ -131,6 +133,8 @@ export interface SessionReportPayload {
   weakExpressions: PatternEntry[];
   stylePatterns: PatternEntry[];
   sessionSummary: string;
+  todaySummary: string;
+  nextGoal: string;
 }
 
 // Holds one learner's roleplay session as instance state (rather than the
@@ -450,6 +454,8 @@ export class ChatSession {
         checklistNotes: reportResponse?.checklist_notes ?? [],
         focusSuggestions: reportResponse?.focus_suggestions ?? [],
         reportText,
+        today_summary: reportResponse?.today_summary ?? "",
+        next_goal: reportResponse?.next_goal ?? "",
       });
     }
 
@@ -475,6 +481,8 @@ export class ChatSession {
       weakExpressions,
       stylePatterns,
       sessionSummary,
+      todaySummary: reportResponse?.today_summary ?? "",
+      nextGoal: reportResponse?.next_goal ?? "",
     };
     return this.report;
   }
@@ -524,6 +532,12 @@ export class ChatSession {
     const divider = "──────────────────────";
 
     lines.push("📋 오늘의 세션 리포트", divider);
+
+    if (reportResponse?.today_summary || reportResponse?.next_goal) {
+      lines.push("");
+      if (reportResponse.today_summary) lines.push(`오늘 총평: ${reportResponse.today_summary}`);
+      if (reportResponse.next_goal) lines.push(`다음 목표: ${reportResponse.next_goal}`);
+    }
 
     if (this.missionChecklist.length > 0) {
       lines.push("", "[미션 체크리스트]");
@@ -773,8 +787,15 @@ export class ChatSession {
     const focusSuggestions = Array.isArray(parsed.focus_suggestions)
       ? parsed.focus_suggestions.filter((s): s is string => typeof s === "string")
       : [];
+    const todaySummary = typeof parsed.today_summary === "string" ? parsed.today_summary : "";
+    const nextGoal = typeof parsed.next_goal === "string" ? parsed.next_goal : "";
 
-    return { checklist_notes: checklistNotes, focus_suggestions: focusSuggestions };
+    return {
+      checklist_notes: checklistNotes,
+      focus_suggestions: focusSuggestions,
+      today_summary: todaySummary,
+      next_goal: nextGoal,
+    };
   }
 
   // Returns null if every attempt fails — the report still gets built using

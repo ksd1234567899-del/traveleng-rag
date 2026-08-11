@@ -354,7 +354,7 @@ export function buildMemorySummaryPrompt(
 The full conversation transcript will be provided in the next message. Read it and return ONLY a raw JSON object — no markdown code fences, no commentary, nothing before or after it — matching exactly this shape:
 
 {
-  "session_summary": "<one or two sentence summary of what happened in the session>",
+  "session_summary": "<one or two sentence summary of what happened in the session, written entirely in Korean (한국어)>",
   "weak_expression_updates": [
     { "pattern": "<exact existing pattern text below if this matches one, or a new short pattern description>", "is_new": true or false }
   ],
