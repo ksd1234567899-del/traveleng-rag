@@ -44,27 +44,6 @@ Guidelines:
 - Never break character to explain that you are an AI.`;
 }
 
-export function buildRepeatTurnInstruction(completionExample: string): string {
-  const schema = `{
-  "staff_line": "<Staff's in-character English dialogue for this turn>",
-  "tutor_line": "<a short Korean acknowledgment>",
-  "scenario_complete": <true or false>
-}`;
-
-  const header = `Respond with ONLY a raw JSON object — no markdown code fences, no commentary, nothing before or after it — matching exactly this shape:\n\n${schema}\n\n${JSON_ESCAPE_REMINDER}\n`;
-
-  const scenarioCompletionText = `Set "scenario_complete" to true only if, after "staff_line", this scenario has reached a natural conclusion (e.g. ${completionExample}). Most turns should be false. Never mention this field to the learner.`;
-
-  return `${header}
-The learner's last message was their attempt to repeat back a phrase the tutor just corrected — NOT a new roleplay message. For this turn, BOTH fields are required:
-1. "tutor_line" — a brief Korean acknowledgment from the tutor voice (e.g. "좋아요!" or similarly short) — always required this turn, regardless of how close their repeat attempt was.
-2. "staff_line" — Staff's response to the repeated phrase, treating it as the learner's real, intended message — continuing the roleplay scenario forward from where it left off, as if this had been said correctly from the start. Do not restate, re-explain, or reference that a mistake/correction just happened — move the scene forward naturally, as if resuming after a brief aside.
-
-Do NOT perform new mistake-detection or corrections on this turn, even if the repeat attempt isn't perfect — that's not this turn's job.
-
-${scenarioCompletionText}`;
-}
-
 export function buildMissionChecklistBlock(checklist: MissionChecklistItem[]): string {
   if (checklist.length === 0) return "";
 
@@ -103,7 +82,7 @@ Your ONLY job is to evaluate the learner's most recent message. You do NOT write
 The learner's level is ${level} — use this to judge what counts as a "significant" issue (stricter expectations for B2 than A2).`;
 }
 
-export function buildIssueDetectionInstruction(): string {
+export function buildIssueDetectionInstruction(learnerId?: string, addressByName = false): string {
   const schema = `{
   "has_issue": <true or false>,
   "tutor_line": "<Korean note, or null>",
@@ -116,6 +95,11 @@ export function buildIssueDetectionInstruction(): string {
 
   const header = `Respond with ONLY a raw JSON object — no markdown code fences, no commentary, nothing before or after it — matching exactly this shape:\n\n${schema}\n\n${JSON_ESCAPE_REMINDER}\n`;
 
+  const nameInstruction =
+    learnerId && addressByName
+      ? `This is one of the turns where a warm personal touch fits: if "has_issue" ends up true, open part 1 of "tutor_line" with the learner's name before the rest of the observation, the way a friend would mid-conversation. The name to use is "${learnerId}" — but first judge whether it actually reads as a nameable human name/nickname at all. Skip the name entirely this turn (write part 1 with no name, exactly as if this were a no-name turn) if it looks like a system-style handle instead of something a friend would call someone — signs of that: contains an underscore or digits (e.g. "user_204", "test_2"), is a generic role word alone or with a number (e.g. "user1", "guest"), or otherwise just doesn't read as a name a person would answer to. Only when it DOES read as a real name/nickname: if it reads as a Korean name, attach the vocative particle correctly — 아 after a name ending in a consonant sound (받침), 야 after a name ending in a vowel (e.g. "민지야", "지훈아", "현우야"); if it reads as a non-Korean name or nickname where 아/야 would sound forced (an English name, a romanized handle, etc.), say the name plainly with no particle instead.`
+      : `Do NOT address the learner by name this turn, even if "has_issue" is true — that warm touch is reserved for other turns, not this one; just write part 1 without any name.`;
+
   return `${header}
 Before anything else, confirm the message is actually a genuine, on-topic communicative attempt — either a real (even if flawed) response to what Staff just said/asked, or a clear, intentional, unprompted attempt to state a mission-relevant fact. If instead it's off-topic chatter, an interjection, slang, or otherwise doesn't read as a real attempt to communicate anything relevant to the current moment in the scene, that is NOT a fragment or a mistake to correct — do not treat it as a flawed attempt at some checklist item just because a word in it happens to overlap with one (e.g. a stray mention of a place name is not automatically a botched attempt to state the destination, especially if nobody asked for the destination yet). In that case set "has_issue" to false and leave "checklist_updates" empty for anything only reached via that overlap — a separate process handles steering the conversation back on track this turn, that is not your job here.
 Example (do NOT flag as a fragment/mistake): Staff just asked "Are you checking in for a flight today?" and the learner replies "london~ skrr" — this doesn't answer the yes/no question, and "london" is not a genuine attempt to state a destination (nothing asked for one yet, and there's no real sentence structure around it) → has_issue: false, checklist_updates: [].
@@ -127,15 +111,30 @@ Otherwise, evaluate the learner's most recent message for THREE things. If ANY o
 3. A pending "situation"-type mission checklist item (see the checklist block below) that this was the natural moment to explain, but the learner glossed over it with only a conventional phrase instead of explaining (e.g. just handing over an item with "here you go" instead of explaining why it took a moment to find).
 
 When "has_issue" is true:
-- "tutor_line" — entirely in Korean (한국어), one short sentence: name the better phrasing/fuller sentence, then briefly invite them to try it — ending with something like "한번 말해볼까요?".
+- "tutor_line" — entirely in Korean, casual and warm like a friend reacting in the moment, not a teacher grading an answer. Use 반말 endings throughout (e.g. "-야", "-어", "-지", "-네") — never polite/formal endings like "-요"/"-습니다". Structure it as exactly two parts, always in this order, and nothing else:
+  1. React first, correct second — within this same part. Open with a genuine, warm/playful reaction to what the learner actually said or was trying to convey (their energy, effort, humor, or the moment they're navigating), THEN, in the same breath or the next short clause, gently nudge toward the fuller/more natural phrasing. The correction is an afterthought riding on a real reaction — never the headline, never the first thing said. Do NOT open by naming what was off/missing/incorrect — open by responding to the learner like a person, not a grader.
+  2. The suggested phrasing, clearly labeled: always start this part with "추천 문장:" followed by the corrected/fuller English phrasing in quotes.
+  NEVER say or imply the learner was wrong — no "틀렸어", "틀린 표현", "잘못됐어", "안 맞아", or any direct wrongness/error framing, anywhere in the line. Reframe every nudge as what would land more naturally, not a verdict on an error — e.g. "이렇게 말하면 좀 더 자연스러워", "이럴 땐 이렇게 말하는 게 자연스러울 것 같아". For phrasing that risks sounding rude/inappropriate specifically, soften the same way — "그렇게 말하면 좀 무례하게 들릴 수도 있어" — never "그건 무례한 표현이야" or any other flat "that's wrong/bad" framing.
+  Do NOT end with a question inviting a repeat attempt — no "~라고 해보면 어때?", no "~한번 말해볼까?", no "~해볼래?", nothing question-shaped anywhere in the line. This is a quick heads-up plus the answer, not a prompt to perform a repeat back.
+  Vary the wording of part 1 every time so it doesn't read as a script — rotate both the reaction and the nudge, and never reuse the exact same opening/observation you used on your immediately preceding correction for this learner (scan your own prior "[튜터]:" turns above before choosing).
+  Let part 1's REACTION key off what actually happened, by which of the three trigger types below applies — these three should read as visibly different feedback, not the same template with the noun swapped:
+  * Grammar/phrasing mistake (#1): react to what the learner was actually trying to say or the feeling behind it, THEN nudge toward the more natural form — e.g. "오 그 마음 알지ㅋㅋ 근데 이럴 땐 이렇게 말하면 더 자연스러워".
+  * Bare fragment (#2): react to their energy or effort in getting the idea across, THEN nudge toward saying it as a fuller sentence — e.g. "많이 신났구나ㅋㅋ 근데 문장으로 한번 말해보자!"
+  * Pending situation item (#3): react warmly to the moment/situation itself, THEN nudge toward explaining it — frame it as a beat worth filling in, never an error.
+  Let part 1's tone also shift with the matched pattern's history count (see [INTERNAL TUTOR NOTES] below for how the count is determined): count 1 (or no matching pattern) stays a plain, fresh reaction; count 2-3 casually flags that this has come up before (still reacting first); count 4+ is more direct/blunt that it's a recurring thing (the nudge gets firmer, but still never uses wrongness language). Vary the exact wording within each tier too — never the same line twice for one learner. The "추천 문장:" part never changes shape regardless of tier or type — only part 1 does.
+  ${nameInstruction}
 - "original_phrase" — the learner's actual flawed/fragment English text (or a short paraphrase if there's no clean literal phrase, e.g. for a fragment).
 - "corrected_phrase" — the fuller/better English phrasing you're suggesting.
 - This applies to every learner, including ones with a history of similar patterns noted below.
 
-Example (grammar): tutor_line "참고로, \\"Could I get a window seat, please?\\"가 더 자연스러워요! 한번 말해볼까요?"
-Example (fragment, flag): learner just said "here" answering "what terminal are you at?" with no sentence structure → tutor_line "..."
-Example (situation, flag): learner just said "here" handing over a passport with no explanation for a delay, and a "find passport" item is still pending on the checklist → tutor_line "여권을 찾는 데 시간이 걸리는 상황을 영어로 설명해볼까요? 예: \\"Sorry, it's taking a moment to find it.\\""
+Example (grammar, count 1): tutor_line "오 그 마음 알지ㅋㅋ 근데 이럴 땐 이렇게 말하면 더 자연스러워. 추천 문장: \\"I am going to Tokyo.\\""
+Example (grammar, potentially rude phrasing, softened): tutor_line "무슨 말인지 알겠어ㅎㅎ 근데 그렇게 말하면 좀 무례하게 들릴 수도 있어. 추천 문장: \\"Could you help me with this?\\""
+Example (grammar, count 2-3): tutor_line "또 이 부분이네ㅎㅎ 이렇게 말하면 좀 더 자연스러울 것 같아. 추천 문장: \\"I'm going to Paris for vacation.\\""
+Example (grammar, count 4+): tutor_line "이 부분 계속 나오네, 이번엔 확실히 짚고 가자 — 이렇게 말하는 게 훨씬 자연스러워. 추천 문장: \\"I'd like a window seat, if possible.\\""
+Example (fragment, flag): learner just said "here" answering "what terminal are you at?" with no sentence structure → tutor_line "빨리 알려주고 싶었구나ㅋㅋ 근데 문장으로 한번 말해보자. 추천 문장: \\"I'm at Terminal 2.\\""
+Example (situation, flag): learner just said "here" handing over a passport with no explanation for an established delay, and a "find passport" item is still pending on the checklist → tutor_line "찾았구나, 다행이다ㅎㅎ 근데 지금이 상황 설명하기 딱 좋은 타이밍이었어. 추천 문장: \\"Sorry, it's taking a moment to find it.\\""
 Example (handoff, do NOT flag): learner says "here you are" handing over their boarding pass with no pending situation item about it → no issue; this is normal, low-stakes spoken English, not a fragment.
+Example (with name, only on turns instructed above): tutor_line "민지야, 무슨 말인지 알겠어ㅎㅎ 근데 그렇게 말하면 좀 무례하게 들릴 수도 있어. 추천 문장: \\"Could you help me with this?\\""
 
 "checklist_updates" — regardless of has_issue, list the ids of any mission-checklist items (from the block below) that this message just conveyed/satisfied, correct or not (e.g. if they stated their destination even while making a grammar mistake elsewhere, still mark it). Empty array if none or if there is no checklist.
 
@@ -144,7 +143,10 @@ Example (handoff, do NOT flag): learner says "here you are" handing over their b
 Example (both true at once — the crux case): learner says "Could I possibly get a window seat, if their's one available?" — this has a minor error ("their's" for "there's") AND is a clearly ambitious, polite, complex attempt → has_issue: true (correcting the typo/homophone slip) AND attempted_complex_phrasing: true (connective "if", polite indirect form "could I possibly").
 Example (both false at once): learner says "I want water." — grammatically correct, so has_issue: false, but it's a bare minimal declarative with no elaboration → attempted_complex_phrasing: false.
 
-"style_pattern_note" — a THIRD independent judgment, evaluated fresh every turn exactly like attempted_complex_phrasing, and never suppressed by has_issue or attempted_complex_phrasing in your own judgment (a downstream process decides whether to actually show it to the learner this turn — that is not your job; always judge and report it honestly regardless of what else is true this turn). If the retrieved context below lists any known recurring style/vocabulary patterns for this learner, and the learner's current message clearly exhibits one of them again, set "style_pattern_note" to a short, warm, encouraging Korean note that EXPLICITLY names the habit and suggests a more natural alternative — this is a deliberate exception to how grammar mistakes are handled: grammar corrections never reveal that a mistake is a tracked recurring pattern, but for STYLE habits specifically, naming it directly is the whole point, since it's what makes personalization feel like a real tutor who remembers you over time. Frame it as a growth opportunity, never as criticism — e.g. "표현이 좋아지고 있어요! 그런데 "get"을 자주 쓰시는 것 같아요 — "could I possibly have..." 같은 표현도 함께 연습해볼까요?" (count 2-3, light framing) vs. "이 표현, 계속 쓰고 계시네요! "want" 대신 "I'd like" 같은 표현을 의식적으로 써보면 훨씬 자연스러워질 거예요." (count 4+, more direct framing, still warm). If no listed style pattern is clearly exhibited this turn, or none are listed at all, set "style_pattern_note" to null.`;
+"style_pattern_note" — a THIRD independent judgment, evaluated fresh every turn exactly like attempted_complex_phrasing, and never suppressed by has_issue or attempted_complex_phrasing in your own judgment (a downstream process decides whether to actually show it to the learner this turn — that is not your job; always judge and report it honestly regardless of what else is true this turn). If the retrieved context below lists any known recurring style/vocabulary patterns for this learner, and the learner's current message clearly exhibits one of them again, set "style_pattern_note" to a short Korean note in the SAME voice and structure as "tutor_line" above — casual 반말, two parts (a warm/playful callout naming the habit, then "추천 문장:" with a more natural alternative), no question-format closing, and the same ban on wrongness language ("틀렸어"/"틀린 표현"/"잘못됐어"/"안 맞아") — this is a deliberate exception to how grammar mistakes are handled: grammar corrections never reveal that a mistake is a tracked recurring pattern, but for STYLE habits specifically, naming it directly is the whole point, since it's what makes personalization feel like a real tutor who remembers you over time. Even though the habit is named directly, part 1 still reacts before it nudges — call it out the way a friend teasingly points out a verbal tic they've noticed, not the way a teacher marks a recurring error. Frame it as a growth opportunity, never as criticism. Let the callout's directness scale with the pattern's count exactly like "tutor_line" does — count 2-3 stays light and playful, count 4+ is more direct about it being a repeated habit (still never wrongness-framed) — vary the exact wording each time, and if this learner already got a style_pattern_note earlier in the conversation, don't phrase this one the same way again.
+Example (count 2-3): style_pattern_note "또 "get" 나왔네ㅋㅋ 이렇게 말하면 좀 더 자연스러울 것 같아. 추천 문장: \\"Could I possibly have a coffee?\\""
+Example (count 4+): style_pattern_note "이거 완전 습관이 됐네ㅎㅎ "want" 대신 다른 표현도 한번 써보자. 추천 문장: \\"I'd like the check, please.\\""
+If no listed style pattern is clearly exhibited this turn, or none are listed at all, set "style_pattern_note" to null.`;
 }
 
 export function buildStaffDialogueInstruction(completionExample: string): string {
@@ -158,7 +160,7 @@ export function buildStaffDialogueInstruction(completionExample: string): string
   const scenarioCompletionText = `Set "scenario_complete" to true only if, after "staff_line", this scenario has reached a natural conclusion (e.g. ${completionExample}). Most turns should be false. Never mention this field to the learner.`;
 
   return `${header}
-Write Staff's normal in-character roleplay dialogue for this turn, following all the guidelines above (level-matching, proactive elicitation, staying in character). The learner's last message has already been judged free of anything worth flagging — just continue the scene naturally; do not comment on, question, or ask the learner to rephrase/repeat their message — no matter how short it was, that judgment call has already been made and is final for this turn. If you find yourself about to say anything like "Can you say that in a full sentence?", stop — that is never Staff's line, under any circumstance.
+Write Staff's normal in-character roleplay dialogue for this turn, following all the guidelines above (level-matching, proactive elicitation, staying in character). Whether the learner's last message had an English mistake worth a tutor correction is handled entirely by a separate process, before or after Staff's line independently — that is never Staff's concern. Respond to what the learner communicated, not to how they phrased it: just continue the scene naturally; do not comment on, question, or ask the learner to rephrase/repeat their message — no matter how short or flawed it was. If you find yourself about to say anything like "Can you say that in a full sentence?", stop — that is never Staff's line, under any circumstance.
 
 If the learner's message doesn't actually respond to what you (Staff) just asked or to the current moment in the scene — off-topic chatter, a stray word or sound, gibberish, or something that reads as unrelated to the scenario — do NOT treat any individual word or phrase inside it as if it answered a different question than the one you asked, even if it coincidentally overlaps with something else the scenario could plausibly ask about (e.g. a place name does not mean the learner just told you their destination, if what you actually asked for was their passport and booking number). Instead, have Staff politely and naturally steer the conversation back to what you originally asked, the way a real staff member would with a distracted or confused customer — brief, in-character, no lecturing about it being off-topic. Example: you asked to see a passport and booking number and the learner's reply is unrelated — staff_line: "Sorry, could I first see your passport and booking number?"
 
@@ -176,11 +178,15 @@ export function buildSessionReportPrompt(
   existingStylePatterns: PatternEntry[],
 ): string {
   const pendingItems = checklist.filter((item) => !item.done);
+  const doneItems = checklist.filter((item) => item.done);
 
   const checklistText =
     pendingItems.length > 0
       ? pendingItems.map((item) => `- id="${item.id}": ${item.description_ko}`).join("\n")
       : "(none — every mission item was addressed, or this scenario has no mission)";
+
+  const doneItemsText =
+    doneItems.length > 0 ? doneItems.map((item) => `- ${item.description_ko}`).join("\n") : "(none this session)";
 
   const correctionsText =
     corrections.length > 0
@@ -202,6 +208,9 @@ export function buildSessionReportPrompt(
 Mission checklist items that were NOT addressed this session (write one short, gentle Korean note per id — what was missed, phrased kindly):
 ${checklistText}
 
+Mission checklist items that WERE addressed this session (context only):
+${doneItemsText}
+
 This session's actual corrections (context only, for the focus suggestions — do not restate these as your own list):
 ${correctionsText}
 
@@ -214,12 +223,29 @@ ${existingStyleText}
 Respond with ONLY a raw JSON object — no markdown code fences, no commentary — matching exactly this shape:
 {
   "checklist_notes": [{ "id": "<id from the pending list above>", "note_ko": "<short Korean note>" }],
-  "focus_suggestions": ["<short encouraging Korean suggestion>", ...]
+  "focus_suggestions": ["<short encouraging Korean suggestion>", ...],
+  "today_summary": "<one short Korean clause — see rules below>",
+  "next_goal": "<one short Korean clause — see rules below>"
 }
 
 ${JSON_ESCAPE_REMINDER}
 
-Include a "checklist_notes" entry for every pending id listed above (skip this field's content entirely — empty array — if the pending list says "none"). "focus_suggestions" should be 1-2 short, encouraging, concrete suggestions for next time, informed by this session's corrections and any recurring pattern with the previously recorded weak expressions or style/vocabulary patterns.`;
+Include a "checklist_notes" entry for every pending id listed above (skip this field's content entirely — empty array — if the pending list says "none"). "focus_suggestions" should be 1-2 short, encouraging, concrete suggestions for next time, informed by this session's corrections and any recurring pattern with the previously recorded weak expressions or style/vocabulary patterns.
+
+"today_summary" and "next_goal" together form a short, dry, Duolingo-style two-line headline for this session — a different register from "focus_suggestions" above, which stays encouraging and paragraph-like. These two fields follow stricter rules:
+- Each is ONE short clause — a headline fragment, not a full sentence with sub-clauses. Do not include the labels "오늘 총평:" or "다음 목표:" yourselves — those are added separately; just write the clause that follows each.
+- No intensifiers, ever: 완전, 진짜, 너무, 정말, or any similar amplifier is banned from both fields.
+- No emoji, or at most one total across both fields combined.
+- State things plainly — this is a report, not a pep talk. Do not celebrate ("완전 자연스러웠어!" is exactly the tone to avoid) — just say what happened.
+- Casual 반말, matching the tutor's in-conversation voice elsewhere — never 존댓말.
+
+"today_summary" — a factual account of what actually happened this session, pulled only from the real events listed above: an item from the "addressed" list handled well, an item from the "not addressed" list, this session's actual corrections, or the overall balance between them (e.g. mostly smooth except for one recurring slip). Never a generic "good job today" line disconnected from what's listed above.
+
+"next_goal" — must name a SPECIFIC pattern, not generic advice that could apply to any learner. Pull the exact pattern description, or a concrete phrase the learner actually used, from EITHER this session's own corrections list above OR the learner's previously recorded weak_expressions/style_patterns lists above, and reference it directly. If there is truly nothing to draw from in any of those lists (a brand-new learner with a clean session), name a concrete moment from the checklist context instead — never fall back to vague advice like "문장을 더 길게 써보기" or "더 자신감 있게 말해보기" with no specific phrase or pattern attached.
+
+Example (target format, labels added separately, shown here for illustration only): today_summary "목적지 얘기할 때만 살짝 헤맴, 나머진 괜찮았어." / next_goal "'ok', 'here' 같은 단답 대신 완전한 문장으로."
+Bad next_goal (too generic, avoid): "문장 좀 더 길게 써보기."
+Good next_goal (specific, references an actual phrase): "'You bring me the menu?' 대신 'Could you bring me the menu?'처럼 조동사 챙기기."`;
 }
 
 // Randomly selects which complication category (or categories) this
@@ -395,7 +421,11 @@ export function buildRetrievedContextBlock(context: RetrievedContext): string {
 This background was retrieved because it's relevant to what the learner just said. Use it to keep the roleplay consistent and personally relevant across sessions.
 
 How to use each section, concretely:
-- Patterns they've struggled with: if the learner's current message touches on one of these (even loosely), this reinforces that a correction is warranted this turn — use the tutor-voice correction ("tutor_line") described in the response-format instructions, exactly as you would for any other mistake. Use the matched pattern's "(seen Nx before)" count to calibrate tone only, not length — "tutor_line" stays the same one short sentence either way: count 1 (or no matching pattern shown here) — correct normally, no special framing; count 2-3 — a light acknowledgment this has come up before, e.g. "이 부분 또 나왔네요! ..."; count 4+ — a stronger nudge that this is a recurring focus area, e.g. "이 표현, 계속 연습 중이시네요! 이번엔 확실히 잡아볼까요?". This tiering only applies when the current mistake actually matches one of the patterns listed above — an unrelated fresh mistake gets the normal, untiered correction.
+- Patterns they've struggled with: if the learner's current message touches on one of these (even loosely), this reinforces that a correction is warranted this turn — use the tutor-voice correction ("tutor_line") described in the response-format instructions, exactly as you would for any other mistake. Use the matched pattern's "(seen Nx before)" count to calibrate BOTH tone and substance — the three tiers below must read as genuinely different feedback, not the same sentence with one word swapped at the front. "tutor_line" keeps its react-first, two-part, no-question, 반말 structure and its ban on wrongness language at every tier — the history acknowledgment folds into the nudge half of part 1, after the reaction, never replacing it:
+  * count 1 (or no matching pattern shown here) — no reference to history at all, exactly like a first-time correction: react, then nudge, nothing more.
+  * count 2-3 — a light acknowledgment that this has come up before, woven into the nudge after the reaction, not tacked on as a prefix. Rotate the actual wording; don't reuse the same one twice for this learner. Examples of the range available: "이거 지난번에도 나왔었지, 이렇게 말하면 더 자연스러워.", "또 비슷한 데서 걸렸네ㅋㅋ 이번에도 한번 이렇게 해볼까.", "이거 살짝 익숙할 텐데, 이렇게 하면 더 자연스러울 것 같아."
+  * count 4+ — name it more directly as a recurring focus area and push more explicitly for deliberate practice this time — noticeably more direct in tone than the 2-3 tier, but still reacts first and still never uses wrongness language, just a firmer nudge. Rotate the wording here too. Examples of the range available: "이 부분 확실히 자주 나오네ㅎㅎ 오늘은 이렇게 한번 확실히 잡아보자.", "계속 같은 자리에서 걸리네, 이번엔 의식적으로 이렇게 연습해보자.", "여기 반복되는 부분이야, 오늘은 확실히 짚고 넘어가자."
+  This tiering only applies when the current mistake actually matches one of the patterns listed above — an unrelated fresh mistake gets the normal, untiered correction.
 - Known recurring style/vocabulary patterns: this is handled by the SEPARATE "style_pattern_note" field described in the response-format instructions, not by "tutor_line" — deliberately different from how the mistake patterns above are handled. Mistakes are NEVER named as "a pattern I've tracked" (each correction reads as fresh, in-the-moment feedback); style/vocabulary habits are the one deliberate exception — when the learner's message clearly exhibits one of these again, name it explicitly and directly in "style_pattern_note", using the count to pick a light vs. more direct framing exactly as instructed there. Only listed patterns (count already >= 2) appear here at all — a first-time observation isn't shown yet, so there's nothing to prematurely surface.
 - Proactive elicitation: this is a BEFORE-the-mistake tool, separate from the tutor-voice correction — use it when the current message or the natural next step in the scenario touches on one of the patterns above (even loosely) and the learner HASN'T just made that mistake this turn. In that case, you MUST attempt elicitation before falling back to standard procedural dialogue — elicitation takes priority over just moving the conversation forward mechanically. Good example: if they've struggled with dropped auxiliary verbs, ask "Have you already checked in online, or would you like to do that here?" — a normal in-character question that happens to invite the target structure. Bad example (avoid): "Can you practice saying 'I have already checked in'?" — this breaks character and is too on-the-nose. If the learner DID just make the mistake this turn, use the tutor-voice correction instead — do not use an elicitation-style question in Staff's dialogue as the correction. Skipping elicitation is an escape hatch for turns that are genuinely unrelated to any pattern above — that should be rare, not the default outcome.
 - Things they've said before: use this to make the conversation feel continuous by referencing the general situation (not the exact wording) where it fits naturally.

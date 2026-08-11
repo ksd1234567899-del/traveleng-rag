@@ -136,7 +136,6 @@ app.post("/session/message", async (req: Request, res: Response) => {
       tutorLine: result.tutorLine,
       styleNote: result.styleNote,
       scenarioComplete: result.scenarioComplete,
-      awaitingRepeat: result.awaitingRepeat,
       missionChecklist: result.missionChecklist,
       report: result.report,
     });
