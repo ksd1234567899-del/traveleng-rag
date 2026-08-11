@@ -8,7 +8,6 @@ import {
   buildMemorySummaryPrompt,
   buildMissionChecklistBlock,
   buildOpeningInstruction,
-  buildRepeatTurnInstruction,
   buildRetrievedContextBlock,
   buildSessionReportPrompt,
   buildStaffDialogueInstruction,
@@ -35,6 +34,15 @@ import { computeLevelAdjustment } from "./levelAdjustment.js";
 // "user", so this triggers the AI-led opening while staying invisible to
 // the learner and excluded from logs/summaries (see getLoggableMessages).
 const SESSION_START_MARKER = "[SESSION START — internal trigger, not learner input]";
+
+// Controls how often the tutor voice addresses the learner by name (roughly
+// every 3rd-4th correction) — decided in code rather than left to the
+// model's own judgment, same reasoning as pickMissionElements in prompts.ts:
+// frequency the model is asked to self-regulate reliably drifts, so the
+// random draw and the counter live here instead.
+function randomNameAddressThreshold(): number {
+  return Math.random() < 0.5 ? 3 : 4;
+}
 
 function contentToText(content: Anthropic.MessageParam["content"]): string {
   if (typeof content === "string") return content;
@@ -74,12 +82,6 @@ interface StaffDialogueResponse {
   scenario_complete: boolean;
 }
 
-interface RepeatTurnResponse {
-  staff_line: string;
-  tutor_line: string;
-  scenario_complete: boolean;
-}
-
 interface OpeningResponse {
   mission_briefing: string;
   staff_line: string;
@@ -102,7 +104,6 @@ export interface MessageTurnResult {
   tutorLine: string | null;
   styleNote: string | null;
   scenarioComplete: boolean;
-  awaitingRepeat: boolean;
   missionChecklist: MissionChecklistItem[];
   // Set only when this turn triggered auto-finalize (scenarioComplete: true).
   report: SessionReportPayload | null;
@@ -150,11 +151,18 @@ export class ChatSession {
 
   private readonly missionChecklist: MissionChecklistItem[] = [];
   private readonly sessionCorrections: { wrong: string; fixed: string }[] = [];
+  // Mirrors the assistant/user turns in this.messages, but keeps each turn's
+  // distinct speakers (Mission briefing / Tutor(KO) / Staff) as separate
+  // labeled segments instead of the single pre-merged string this.messages
+  // needs for the Anthropic API — built at the point content is generated so
+  // writeSessionLog can label speakers reliably instead of re-parsing later.
+  private readonly turnLog: SessionTurn[] = [];
   private totalNormalTurns = 0;
   private totalComplexAttempts = 0;
   private styleNoteShownThisSession = false;
   private totalDetectionFailures = 0;
-  private awaitingRepeat = false;
+  private correctionsSinceNameAddress = 0;
+  private nameAddressThreshold = randomNameAddressThreshold();
 
   ended = false;
   report: SessionReportPayload | null = null;
@@ -206,6 +214,14 @@ export class ChatSession {
 
     const displayText = `${parsed.mission_briefing}\n\n${parsed.staff_line}`;
     this.messages.push({ role: "assistant", content: displayText });
+    this.turnLog.push({
+      role: "assistant",
+      text: displayText,
+      segments: [
+        { label: "Mission", text: parsed.mission_briefing },
+        { label: "Staff", text: parsed.staff_line },
+      ],
+    });
 
     return {
       missionBriefing: parsed.mission_briefing,
@@ -214,17 +230,16 @@ export class ChatSession {
     };
   }
 
-  // `mode` drives the tutor-voice state machine: "normal" = real roleplay
-  // input, evaluated by a narrow issue-detection call before Staff ever gets
-  // a turn to speak; "repeat" = the learner's message is their attempt to
-  // repeat back a correction, tutor briefly acknowledges and Staff continues
-  // (single combined call, unchanged).
+  // Every turn runs a narrow issue-detection call first, then Staff's normal
+  // dialogue call — a flagged correction rides alongside Staff's next line
+  // in the same turn rather than pausing the scene for a scripted repeat-back.
   async sendMessage(userInput: string): Promise<MessageTurnResult> {
     if (this.ended) {
       throw new Error("Chat session has already ended");
     }
 
     this.messages.push({ role: "user", content: userInput });
+    this.turnLog.push({ role: "user", text: userInput });
 
     const retrieved = await retrieveContext({
       learnerId: this.learnerId,
@@ -234,36 +249,20 @@ export class ChatSession {
     const retrievedContextBlock = buildRetrievedContextBlock(retrieved);
     const checklistBlock = buildMissionChecklistBlock(this.missionChecklist);
 
-    if (this.awaitingRepeat) {
-      const turnSystemPrompt =
-        this.systemPrompt + "\n\n" + retrievedContextBlock + "\n\n" + buildRepeatTurnInstruction(this.scenario.completionExample);
-
-      debugLog(
-        this.learnerId,
-        `\n[chat debug] --- final system prompt sent to Claude (learner_id=${this.learnerId}, call=repeat) ---\n${turnSystemPrompt}\n[chat debug] --- end system prompt ---\n`,
-      );
-
-      const parsed = await this.requestRepeatTurn(turnSystemPrompt);
-      this.messages.push({ role: "assistant", content: `[튜터]: ${parsed.tutor_line}\n\n${parsed.staff_line}` });
-      this.awaitingRepeat = false;
-
-      return this.finishTurn({
-        staffLine: parsed.staff_line,
-        tutorLine: parsed.tutor_line,
-        styleNote: null,
-        scenarioComplete: parsed.scenario_complete,
-        awaitingRepeat: false,
-        missionChecklist: this.missionChecklist,
-        report: null,
-      });
-    }
-
     // Call A (issue detection) always runs first; Call B (staff dialogue)
-    // only runs if Call A found nothing worth flagging. Neither call's
-    // prompt ever asks the model to do the other's job.
+    // always runs after, regardless of what Call A found — a correction no
+    // longer pauses the scene waiting for a scripted repeat-back, it's shown
+    // alongside Staff's next line in the same turn.
     this.totalNormalTurns += 1;
+    const addressByName = this.correctionsSinceNameAddress >= this.nameAddressThreshold;
     const detectionSystemPrompt =
-      this.issueDetectionSystemPrompt + "\n\n" + retrievedContextBlock + "\n\n" + checklistBlock + "\n\n" + buildIssueDetectionInstruction();
+      this.issueDetectionSystemPrompt +
+      "\n\n" +
+      retrievedContextBlock +
+      "\n\n" +
+      checklistBlock +
+      "\n\n" +
+      buildIssueDetectionInstruction(this.learnerId, addressByName);
 
     debugLog(
       this.learnerId,
@@ -274,25 +273,34 @@ export class ChatSession {
     this.applyChecklistUpdates(detection.checklist_updates);
     if (detection.attempted_complex_phrasing) this.totalComplexAttempts += 1;
 
+    let tutorLine: string | null = null;
+    // Style notes only ever surface on a turn without a grammar correction —
+    // capped at once per session either way.
+    let styleNote: string | null = null;
+
     if (detection.has_issue) {
+      if (addressByName) {
+        this.correctionsSinceNameAddress = 0;
+        this.nameAddressThreshold = randomNameAddressThreshold();
+      } else {
+        this.correctionsSinceNameAddress += 1;
+      }
+
       this.sessionCorrections.push({
         wrong: detection.original_phrase as string,
         fixed: detection.corrected_phrase as string,
       });
-      this.messages.push({ role: "assistant", content: `[튜터]: ${detection.tutor_line}` });
-      this.awaitingRepeat = true;
-
-      return this.finishTurn({
-        staffLine: null,
-        tutorLine: detection.tutor_line,
-        styleNote: null,
-        scenarioComplete: false,
-        awaitingRepeat: true,
-        missionChecklist: this.missionChecklist,
-        report: null,
-      });
+      tutorLine = detection.tutor_line;
+    } else if (detection.style_pattern_note && !this.styleNoteShownThisSession) {
+      this.styleNoteShownThisSession = true;
+      styleNote = detection.style_pattern_note;
     }
 
+    // this.messages must still end on the learner's own user turn going into
+    // this call — the tutor correction (if any) is folded into the SAME
+    // assistant push as staff_line below, never pushed on its own first,
+    // otherwise the conversation would end on an assistant turn and the API
+    // rejects the next call ("must end with a user message").
     const staffSystemPrompt =
       this.systemPrompt + "\n\n" + retrievedContextBlock + "\n\n" + checklistBlock + "\n\n" + buildStaffDialogueInstruction(this.scenario.completionExample);
 
@@ -306,23 +314,26 @@ export class ChatSession {
     );
 
     const staffResp = await this.requestStaffDialogue(staffSystemPrompt);
-    this.messages.push({ role: "assistant", content: staffResp.staff_line });
-
-    // Only reachable when !detection.has_issue — this IS the code-side
-    // suppression: a style note never coexists with a grammar correction in
-    // the same turn. Capped at once per session.
-    let styleNote: string | null = null;
-    if (detection.style_pattern_note && !this.styleNoteShownThisSession) {
-      this.styleNoteShownThisSession = true;
-      styleNote = detection.style_pattern_note;
-    }
+    this.messages.push({
+      role: "assistant",
+      content: tutorLine ? `[튜터]: ${tutorLine}\n\n${staffResp.staff_line}` : staffResp.staff_line,
+    });
+    this.turnLog.push({
+      role: "assistant",
+      text: tutorLine ? `[튜터]: ${tutorLine}\n\n${staffResp.staff_line}` : staffResp.staff_line,
+      segments: tutorLine
+        ? [
+            { label: "Tutor(KO)", text: tutorLine },
+            { label: "Staff", text: staffResp.staff_line },
+          ]
+        : [{ label: "Staff", text: staffResp.staff_line }],
+    });
 
     return this.finishTurn({
       staffLine: staffResp.staff_line,
-      tutorLine: null,
+      tutorLine,
       styleNote,
       scenarioComplete: staffResp.scenario_complete,
-      awaitingRepeat: false,
       missionChecklist: this.missionChecklist,
       report: null,
     });
@@ -355,11 +366,7 @@ export class ChatSession {
     this.ended = true;
 
     const loggable = this.getLoggableMessages();
-    const turns: SessionTurn[] = loggable.map((m) => ({
-      role: m.role as "user" | "assistant",
-      text: contentToText(m.content),
-    }));
-    const sessionLogResult = writeSessionLog({ learnerId: this.learnerId, scenarioId: this.scenario.id, turns });
+    const sessionLogResult = writeSessionLog({ learnerId: this.learnerId, scenarioId: this.scenario.id, turns: this.turnLog });
 
     const reportResponse = await this.requestSessionReport();
     const reportText = this.buildSessionReportText(reportResponse);
@@ -372,13 +379,19 @@ export class ChatSession {
     let weakExpressions = this.learnerProfile.weak_expressions;
     let stylePatterns = this.learnerProfile.style_patterns;
     let levelAdjustment = { newLevel: this.learnerProfile.level, reason: "no conversation to save" };
+    // This session's raw is_new deltas — kept separate from the cumulative
+    // weakExpressions/stylePatterns snapshot above so analysis can tell which
+    // patterns were newly created THIS session vs. recurred from a prior one,
+    // without having to diff consecutive session files.
+    let weakExpressionUpdates: { pattern: string; is_new: boolean }[] = [];
+    let stylePatternUpdates: { pattern: string; is_new: boolean }[] = [];
 
     if (loggable.length > 0) {
       try {
         const parsed = await this.requestMemorySummary(transcript);
         sessionSummary = parsed?.session_summary ?? sessionSummary;
-        const weakExpressionUpdates = Array.isArray(parsed?.weak_expression_updates) ? parsed.weak_expression_updates : [];
-        const stylePatternUpdates = Array.isArray(parsed?.style_pattern_updates) ? parsed.style_pattern_updates : [];
+        weakExpressionUpdates = Array.isArray(parsed?.weak_expression_updates) ? parsed.weak_expression_updates : [];
+        stylePatternUpdates = Array.isArray(parsed?.style_pattern_updates) ? parsed.style_pattern_updates : [];
 
         const updatedProfile = updateLearnerAfterSession(this.learnerId, sessionSummary, weakExpressionUpdates, stylePatternUpdates);
         weakExpressions = updatedProfile.weak_expressions;
@@ -426,9 +439,17 @@ export class ChatSession {
         totalComplexAttempts: this.totalComplexAttempts,
         weak_expressions: weakExpressions,
         style_patterns: stylePatterns,
+        // Raw is_new deltas for THIS session only — a subset (is_new: true)
+        // of the cumulative weak_expressions/style_patterns snapshot above.
+        weak_expression_updates_this_session: weakExpressionUpdates,
+        style_pattern_updates_this_session: stylePatternUpdates,
         mission_checklist: this.missionChecklist,
         totalDetectionFailures: this.totalDetectionFailures,
         session_end_type: sessionEndType,
+        corrections: this.sessionCorrections,
+        checklistNotes: reportResponse?.checklist_notes ?? [],
+        focusSuggestions: reportResponse?.focus_suggestions ?? [],
+        reportText,
       });
     }
 
@@ -675,48 +696,6 @@ export class ChatSession {
       (includeReformatNudge) =>
         this.requestStaffDialogueOnce(turnSystemPrompt, includeReformatNudge ? withReformatNudge(this.messages) : this.messages),
       () => ({ staff_line: "Sorry, could you say that again?", scenario_complete: false }),
-    );
-  }
-
-  private async requestRepeatTurnOnce(
-    turnSystemPrompt: string,
-    callMessages: Anthropic.MessageParam[],
-  ): Promise<RepeatTurnResponse> {
-    const response = await this.client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1024,
-      system: turnSystemPrompt,
-      messages: callMessages,
-    });
-
-    const textBlock = response.content.find((block) => block.type === "text");
-    if (!textBlock) {
-      throw new Error("No text block in repeat-turn response");
-    }
-
-    const cleaned = textBlock.text.trim().replace(/^```json\s*|^```\s*|\s*```$/g, "");
-    const parsed = JSON.parse(cleaned) as Partial<RepeatTurnResponse>;
-    if (typeof parsed.staff_line !== "string" || typeof parsed.tutor_line !== "string") {
-      throw new Error("Repeat-turn response missing staff_line or tutor_line");
-    }
-
-    return { staff_line: parsed.staff_line, tutor_line: parsed.tutor_line, scenario_complete: parsed.scenario_complete === true };
-  }
-
-  // The reformat-nudge messages array is a local throwaway — it must never
-  // mutate the shared `this.messages`, which is reused as real conversation
-  // history on every future turn (withReformatNudge already returns a fresh
-  // array).
-  private async requestRepeatTurn(turnSystemPrompt: string): Promise<RepeatTurnResponse> {
-    return requestWithRetry(
-      "Repeat-turn",
-      (includeReformatNudge) =>
-        this.requestRepeatTurnOnce(turnSystemPrompt, includeReformatNudge ? withReformatNudge(this.messages) : this.messages),
-      () => ({
-        staff_line: "Sorry, could you say that again?",
-        tutor_line: "좋아요!",
-        scenario_complete: false,
-      }),
     );
   }
 

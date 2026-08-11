@@ -200,6 +200,7 @@ export class PretestSession {
         correctionRate: rate,
         complexRate,
         starting_level: levelAdjustment.newLevel,
+        level_adjustment_reason: levelAdjustment.reason,
         totalNormalTurns: this.turnCount,
         totalDetectionFailures: this.detectionFailureCount,
         valid_measurement: validMeasurement,
