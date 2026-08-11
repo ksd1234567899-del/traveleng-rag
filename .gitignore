@@ -3,3 +3,5 @@ dist
 .env
 *.sqlite
 src/db/vectorstore/
+participants/
+participants-backup.tar.gz
