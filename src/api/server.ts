@@ -2,8 +2,8 @@ import "dotenv/config";
 import { randomUUID } from "node:crypto";
 import express, { type Request, type Response } from "express";
 import cors from "cors";
-import { ChatSession } from "../lib/chatSession.js";
-import { PretestSession } from "../lib/pretestSession.js";
+import { ChatSession, type SessionReportPayload } from "../lib/chatSession.js";
+import { PretestSession, type PretestReportPayload } from "../lib/pretestSession.js";
 import { learnerExists } from "../lib/memory.js";
 
 const PORT = Number(process.env.PORT ?? 3000);
@@ -34,12 +34,38 @@ function touch(entry: SessionEntry): void {
   entry.lastActivityAt = Date.now();
 }
 
+// ChatSession/PretestSession mutate shared instance state (this.messages,
+// turnLog, etc.) on every sendMessage()/end() call. Without this, two
+// concurrent requests for the same sessionId (frontend retry, double-submit,
+// or a race with the idle sweep below) could interleave those mutations —
+// e.g. one request's finished turn pushes an assistant reply onto
+// this.messages while another request's in-flight call is still building its
+// own request payload, leaving that payload ending on an assistant turn.
+// Claude models 4.6+ reject that shape outright: "This model does not
+// support assistant message prefill." Serializing all state-mutating calls
+// per sessionId here removes the interleaving, not just the symptom.
+const sessionQueues = new Map<string, Promise<unknown>>();
+
+function withSessionLock<T>(sessionId: string, fn: () => Promise<T>): Promise<T> {
+  const previous = sessionQueues.get(sessionId) ?? Promise.resolve();
+  const run = previous.then(fn, fn);
+  const tail = run.then(
+    () => undefined,
+    () => undefined,
+  );
+  sessionQueues.set(sessionId, tail);
+  tail.then(() => {
+    if (sessionQueues.get(sessionId) === tail) sessionQueues.delete(sessionId);
+  });
+  return run;
+}
+
 setInterval(() => {
   const now = Date.now();
-  for (const entry of sessions.values()) {
+  for (const [sessionId, entry] of sessions.entries()) {
     if (entry.session.ended) continue;
     if (now - entry.lastActivityAt < IDLE_TIMEOUT_MS) continue;
-    entry.session.end().catch((error) => {
+    withSessionLock<SessionReportPayload | PretestReportPayload>(sessionId, () => entry.session.end()).catch((error) => {
       console.error("Failed to auto-finalize idle session:", error);
     });
   }
@@ -116,29 +142,39 @@ app.post("/session/message", async (req: Request, res: Response) => {
     return;
   }
 
+  touch(entry);
+
   try {
-    touch(entry);
-    if (entry.kind === "pretest") {
+    await withSessionLock(sessionId, async () => {
+      // Re-check after the lock: an earlier queued request for this same
+      // sessionId may have ended the session while this one was waiting.
+      if (entry.session.ended) {
+        res.status(409).json({ error: "Session has already ended", report: entry.session.report });
+        return;
+      }
+
+      if (entry.kind === "pretest") {
+        const result = await entry.session.sendMessage(message);
+        res.json({
+          kind: "pretest",
+          partnerLine: result.partnerLine,
+          pretestComplete: result.pretestComplete,
+          report: result.report,
+        });
+        return;
+      }
+
       const result = await entry.session.sendMessage(message);
       res.json({
-        kind: "pretest",
-        partnerLine: result.partnerLine,
-        pretestComplete: result.pretestComplete,
+        kind: "scenario",
+        turnNumber: result.turnNumber,
+        staffLine: result.staffLine,
+        tutorLine: result.tutorLine,
+        styleNote: result.styleNote,
+        scenarioComplete: result.scenarioComplete,
+        missionChecklist: result.missionChecklist,
         report: result.report,
       });
-      return;
-    }
-
-    const result = await entry.session.sendMessage(message);
-    res.json({
-      kind: "scenario",
-      turnNumber: result.turnNumber,
-      staffLine: result.staffLine,
-      tutorLine: result.tutorLine,
-      styleNote: result.styleNote,
-      scenarioComplete: result.scenarioComplete,
-      missionChecklist: result.missionChecklist,
-      report: result.report,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -160,7 +196,7 @@ app.post("/session/end", async (req: Request, res: Response) => {
   }
 
   try {
-    const report = await entry.session.end();
+    const report = await withSessionLock<SessionReportPayload | PretestReportPayload>(sessionId, () => entry.session.end());
     res.json({ kind: entry.kind, report });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
