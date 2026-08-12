@@ -29,6 +29,14 @@ export function computeLevelAdjustment(
   correctionCount: number,
   turnCount: number,
   complexAttemptCount: number,
+  // Denominator for complexRate — turns where attempting complex phrasing was
+  // actually a contextually reasonable option (see complex_phrasing_eligible
+  // in prompts.ts), NOT turnCount. A session with several closed yes/no
+  // exchanges shouldn't have complexRate diluted by turns where ambitious
+  // phrasing was never on the table to begin with — correctionRate still
+  // uses turnCount (a legitimate short answer never gets flagged as a
+  // mistake, so it only ever helps correctionRate, never needs excluding).
+  complexEligibleTurnCount: number,
 ): { newLevel: string; reason: string } {
   if (turnCount < MIN_TURNS_FOR_LEVEL_ADJUSTMENT) {
     return {
@@ -38,9 +46,9 @@ export function computeLevelAdjustment(
   }
 
   const rate = correctionCount / turnCount;
-  const complexRate = complexAttemptCount / turnCount;
+  const complexRate = complexEligibleTurnCount > 0 ? complexAttemptCount / complexEligibleTurnCount : 0;
   const idx = LEVELS.indexOf(level);
-  const rateStr = `correction rate ${rate.toFixed(2)}, complex-phrasing attempt rate ${complexRate.toFixed(2)}`;
+  const rateStr = `correction rate ${rate.toFixed(2)}, complex-phrasing attempt rate ${complexRate.toFixed(2)} (${complexAttemptCount}/${complexEligibleTurnCount} complex-eligible turns)`;
 
   if (rate < RAISE_LEVEL_THRESHOLD && complexRate >= COMPLEX_RAISE_THRESHOLD && idx < LEVELS.length - 1) {
     const newLevel = LEVELS[idx + 1];

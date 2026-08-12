@@ -68,6 +68,7 @@ interface IssueDetectionResponse {
   corrected_phrase: string | null;
   checklist_updates: string[];
   attempted_complex_phrasing: boolean;
+  complex_phrasing_eligible: boolean;
   style_pattern_note: string | null;
 }
 
@@ -119,6 +120,7 @@ export interface SessionReportPayload {
   totalNormalTurns: number;
   totalCorrections: number;
   totalComplexAttempts: number;
+  totalComplexEligibleTurns: number;
   totalDetectionFailures: number;
   missionChecklist: MissionChecklistItem[];
   corrections: { wrong: string; fixed: string; turnNumber: number; mistakeType: MistakeType }[];
@@ -158,6 +160,12 @@ export class ChatSession {
   private readonly turnLog: SessionTurn[] = [];
   private totalNormalTurns = 0;
   private totalComplexAttempts = 0;
+  // Denominator for complexRate — only turns where attempting complex phrasing
+  // was actually a contextually reasonable option (see complex_phrasing_eligible
+  // in prompts.ts), NOT every normal turn. A session with several closed
+  // yes/no exchanges shouldn't have complexRate diluted by turns where
+  // ambitious phrasing was never a real option to begin with.
+  private totalComplexEligibleTurns = 0;
   private styleNoteShownThisSession = false;
   private totalDetectionFailures = 0;
 
@@ -268,6 +276,7 @@ export class ChatSession {
     const detection = await this.requestIssueDetection(detectionSystemPrompt);
     this.applyChecklistUpdates(detection.checklist_updates);
     if (detection.attempted_complex_phrasing) this.totalComplexAttempts += 1;
+    if (detection.complex_phrasing_eligible) this.totalComplexEligibleTurns += 1;
 
     let tutorLine: string | null = null;
     // Style notes only ever surface on a turn without a grammar correction —
@@ -401,6 +410,7 @@ export class ChatSession {
           this.sessionCorrections.length,
           this.totalNormalTurns,
           this.totalComplexAttempts,
+          this.totalComplexEligibleTurns,
         );
         debugLog(this.learnerId, `[chat debug] level adjustment: ${levelAdjustment.reason}`);
         if (levelAdjustment.newLevel !== this.learnerProfile.level) {
@@ -412,7 +422,7 @@ export class ChatSession {
     }
 
     const correctionRate = this.totalNormalTurns > 0 ? this.sessionCorrections.length / this.totalNormalTurns : 0;
-    const complexRate = this.totalNormalTurns > 0 ? this.totalComplexAttempts / this.totalNormalTurns : 0;
+    const complexRate = this.totalComplexEligibleTurns > 0 ? this.totalComplexAttempts / this.totalComplexEligibleTurns : 0;
 
     if (sessionLogResult) {
       writeSessionData(this.learnerId, sessionLogResult.baseName, {
@@ -429,6 +439,7 @@ export class ChatSession {
         totalNormalTurns: this.totalNormalTurns,
         totalCorrections: this.sessionCorrections.length,
         totalComplexAttempts: this.totalComplexAttempts,
+        totalComplexEligibleTurns: this.totalComplexEligibleTurns,
         weak_expressions: weakExpressions,
         style_patterns: stylePatterns,
         // Raw is_new deltas for THIS session only — a subset (is_new: true)
@@ -460,6 +471,7 @@ export class ChatSession {
       totalNormalTurns: this.totalNormalTurns,
       totalCorrections: this.sessionCorrections.length,
       totalComplexAttempts: this.totalComplexAttempts,
+      totalComplexEligibleTurns: this.totalComplexEligibleTurns,
       totalDetectionFailures: this.totalDetectionFailures,
       missionChecklist: this.missionChecklist,
       corrections: this.sessionCorrections,
@@ -618,6 +630,7 @@ export class ChatSession {
       ? parsed.checklist_updates.filter((id): id is string => typeof id === "string")
       : [];
     const attemptedComplexPhrasing = parsed.attempted_complex_phrasing === true;
+    const complexPhrasingEligible = parsed.complex_phrasing_eligible === true;
     const stylePatternNote =
       typeof parsed.style_pattern_note === "string" && parsed.style_pattern_note.trim() ? parsed.style_pattern_note : null;
     const validMistakeTypes: MistakeType[] = ["spelling", "vocabulary", "grammar", "unnatural_phrasing"];
@@ -640,6 +653,7 @@ export class ChatSession {
         corrected_phrase: typeof parsed.corrected_phrase === "string" ? parsed.corrected_phrase : "(unspecified)",
         checklist_updates: checklistUpdates,
         attempted_complex_phrasing: attemptedComplexPhrasing,
+        complex_phrasing_eligible: complexPhrasingEligible,
         style_pattern_note: stylePatternNote,
       };
     }
@@ -652,6 +666,7 @@ export class ChatSession {
       corrected_phrase: null,
       checklist_updates: checklistUpdates,
       attempted_complex_phrasing: attemptedComplexPhrasing,
+      complex_phrasing_eligible: complexPhrasingEligible,
       style_pattern_note: stylePatternNote,
     };
   }
@@ -671,6 +686,7 @@ export class ChatSession {
           corrected_phrase: null,
           checklist_updates: [],
           attempted_complex_phrasing: false,
+          complex_phrasing_eligible: false,
           style_pattern_note: null,
         };
       },

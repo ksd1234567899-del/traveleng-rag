@@ -53,6 +53,7 @@ interface PretestLineResponse {
 interface IssueDetectionResponse {
   has_issue: boolean;
   attempted_complex_phrasing: boolean;
+  complex_phrasing_eligible: boolean;
 }
 
 export interface PretestOpeningResult {
@@ -99,6 +100,9 @@ export class PretestSession {
   private turnCount = 0;
   private correctionCount = 0;
   private complexAttemptCount = 0;
+  // Denominator for complexRate — see the same field's comment in
+  // chatSession.ts for why this differs from turnCount.
+  private complexEligibleTurnCount = 0;
   private detectionFailureCount = 0;
 
   ended = false;
@@ -145,6 +149,7 @@ export class PretestSession {
     const detection = await this.requestPretestIssueDetection();
     if (detection.has_issue) this.correctionCount += 1;
     if (detection.attempted_complex_phrasing) this.complexAttemptCount += 1;
+    if (detection.complex_phrasing_eligible) this.complexEligibleTurnCount += 1;
 
     const isLastTurn = this.turnCount >= PRETEST_MAX_LEARNER_TURNS;
     const reply = await this.requestPretestLine(
@@ -186,11 +191,12 @@ export class PretestSession {
       this.correctionCount,
       this.turnCount,
       this.complexAttemptCount,
+      this.complexEligibleTurnCount,
     );
     updateLearnerLevel(this.learnerId, levelAdjustment.newLevel);
 
     const rate = this.turnCount > 0 ? this.correctionCount / this.turnCount : 0;
-    const complexRate = this.turnCount > 0 ? this.complexAttemptCount / this.turnCount : 0;
+    const complexRate = this.complexEligibleTurnCount > 0 ? this.complexAttemptCount / this.complexEligibleTurnCount : 0;
     const validMeasurement = this.turnCount >= MIN_TURNS_FOR_LEVEL_ADJUSTMENT;
 
     if (sessionLogResult) {
@@ -202,6 +208,7 @@ export class PretestSession {
         starting_level: levelAdjustment.newLevel,
         level_adjustment_reason: levelAdjustment.reason,
         totalNormalTurns: this.turnCount,
+        totalComplexEligibleTurns: this.complexEligibleTurnCount,
         totalDetectionFailures: this.detectionFailureCount,
         valid_measurement: validMeasurement,
       });
@@ -273,11 +280,16 @@ export class PretestSession {
     }
 
     const cleaned = textBlock.text.trim().replace(/^```json\s*|^```\s*|\s*```$/g, "");
-    const parsed = JSON.parse(cleaned) as { has_issue?: unknown; attempted_complex_phrasing?: unknown };
+    const parsed = JSON.parse(cleaned) as {
+      has_issue?: unknown;
+      attempted_complex_phrasing?: unknown;
+      complex_phrasing_eligible?: unknown;
+    };
 
     return {
       has_issue: parsed.has_issue === true,
       attempted_complex_phrasing: parsed.attempted_complex_phrasing === true,
+      complex_phrasing_eligible: parsed.complex_phrasing_eligible === true,
     };
   }
 
@@ -292,7 +304,7 @@ export class PretestSession {
         ),
       () => {
         this.detectionFailureCount += 1;
-        return { has_issue: false, attempted_complex_phrasing: false };
+        return { has_issue: false, attempted_complex_phrasing: false, complex_phrasing_eligible: false };
       },
     );
   }
