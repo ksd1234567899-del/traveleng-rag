@@ -35,15 +35,6 @@ import { computeLevelAdjustment } from "./levelAdjustment.js";
 // the learner and excluded from logs/summaries (see getLoggableMessages).
 const SESSION_START_MARKER = "[SESSION START — internal trigger, not learner input]";
 
-// Controls how often the tutor voice addresses the learner by name (roughly
-// every 3rd-4th correction) — decided in code rather than left to the
-// model's own judgment, same reasoning as pickMissionElements in prompts.ts:
-// frequency the model is asked to self-regulate reliably drifts, so the
-// random draw and the counter live here instead.
-function randomNameAddressThreshold(): number {
-  return Math.random() < 0.5 ? 3 : 4;
-}
-
 function contentToText(content: Anthropic.MessageParam["content"]): string {
   if (typeof content === "string") return content;
   return content
@@ -67,8 +58,11 @@ interface MemorySummary {
   style_pattern_updates: { pattern: string; is_new: boolean }[];
 }
 
+type MistakeType = "spelling" | "vocabulary" | "grammar" | "unnatural_phrasing";
+
 interface IssueDetectionResponse {
   has_issue: boolean;
+  mistake_type: MistakeType | null;
   tutor_line: string | null;
   original_phrase: string | null;
   corrected_phrase: string | null;
@@ -127,7 +121,7 @@ export interface SessionReportPayload {
   totalComplexAttempts: number;
   totalDetectionFailures: number;
   missionChecklist: MissionChecklistItem[];
-  corrections: { wrong: string; fixed: string; turnNumber: number }[];
+  corrections: { wrong: string; fixed: string; turnNumber: number; mistakeType: MistakeType }[];
   checklistNotes: { id: string; note_ko: string }[];
   focusSuggestions: string[];
   reportText: string;
@@ -155,7 +149,7 @@ export class ChatSession {
   private readonly messages: Anthropic.MessageParam[] = [];
 
   private readonly missionChecklist: MissionChecklistItem[] = [];
-  private readonly sessionCorrections: { wrong: string; fixed: string; turnNumber: number }[] = [];
+  private readonly sessionCorrections: { wrong: string; fixed: string; turnNumber: number; mistakeType: MistakeType }[] = [];
   // Mirrors the assistant/user turns in this.messages, but keeps each turn's
   // distinct speakers (Mission briefing / Tutor(KO) / Staff) as separate
   // labeled segments instead of the single pre-merged string this.messages
@@ -166,8 +160,6 @@ export class ChatSession {
   private totalComplexAttempts = 0;
   private styleNoteShownThisSession = false;
   private totalDetectionFailures = 0;
-  private correctionsSinceNameAddress = 0;
-  private nameAddressThreshold = randomNameAddressThreshold();
 
   ended = false;
   report: SessionReportPayload | null = null;
@@ -259,7 +251,6 @@ export class ChatSession {
     // longer pauses the scene waiting for a scripted repeat-back, it's shown
     // alongside Staff's next line in the same turn.
     this.totalNormalTurns += 1;
-    const addressByName = this.correctionsSinceNameAddress >= this.nameAddressThreshold;
     const detectionSystemPrompt =
       this.issueDetectionSystemPrompt +
       "\n\n" +
@@ -267,7 +258,7 @@ export class ChatSession {
       "\n\n" +
       checklistBlock +
       "\n\n" +
-      buildIssueDetectionInstruction(this.learnerId, addressByName);
+      buildIssueDetectionInstruction();
 
     debugLog(
       this.learnerId,
@@ -284,17 +275,11 @@ export class ChatSession {
     let styleNote: string | null = null;
 
     if (detection.has_issue) {
-      if (addressByName) {
-        this.correctionsSinceNameAddress = 0;
-        this.nameAddressThreshold = randomNameAddressThreshold();
-      } else {
-        this.correctionsSinceNameAddress += 1;
-      }
-
       this.sessionCorrections.push({
         wrong: detection.original_phrase as string,
         fixed: detection.corrected_phrase as string,
         turnNumber: this.totalNormalTurns,
+        mistakeType: detection.mistake_type as MistakeType,
       });
       tutorLine = detection.tutor_line;
     } else if (detection.style_pattern_note && !this.styleNoteShownThisSession) {
@@ -635,13 +620,21 @@ export class ChatSession {
     const attemptedComplexPhrasing = parsed.attempted_complex_phrasing === true;
     const stylePatternNote =
       typeof parsed.style_pattern_note === "string" && parsed.style_pattern_note.trim() ? parsed.style_pattern_note : null;
+    const validMistakeTypes: MistakeType[] = ["spelling", "vocabulary", "grammar", "unnatural_phrasing"];
+    const mistakeType = validMistakeTypes.includes(parsed.mistake_type as MistakeType)
+      ? (parsed.mistake_type as MistakeType)
+      : null;
 
     if (parsed.has_issue === true) {
       if (typeof parsed.tutor_line !== "string") {
         throw new Error("Issue-detection response has_issue=true but missing tutor_line");
       }
+      if (mistakeType === null) {
+        throw new Error("Issue-detection response has_issue=true but missing/invalid mistake_type");
+      }
       return {
         has_issue: true,
+        mistake_type: mistakeType,
         tutor_line: parsed.tutor_line,
         original_phrase: typeof parsed.original_phrase === "string" ? parsed.original_phrase : "(unspecified)",
         corrected_phrase: typeof parsed.corrected_phrase === "string" ? parsed.corrected_phrase : "(unspecified)",
@@ -653,6 +646,7 @@ export class ChatSession {
 
     return {
       has_issue: false,
+      mistake_type: null,
       tutor_line: null,
       original_phrase: null,
       corrected_phrase: null,
@@ -671,6 +665,7 @@ export class ChatSession {
         this.totalDetectionFailures += 1;
         return {
           has_issue: false,
+          mistake_type: null,
           tutor_line: null,
           original_phrase: null,
           corrected_phrase: null,

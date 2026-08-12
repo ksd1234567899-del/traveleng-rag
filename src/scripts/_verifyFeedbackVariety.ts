@@ -56,8 +56,6 @@ async function callJSON(systemPrompt: string, messages: Anthropic.MessageParam[]
 async function detect(
   label: string,
   level: string,
-  learnerId: string,
-  addressByName: boolean,
   context: RetrievedContext,
   checklist: MissionChecklistItem[],
   messages: Anthropic.MessageParam[],
@@ -65,12 +63,11 @@ async function detect(
   const systemPrompt = buildIssueDetectionSystemPrompt(scenario, level);
   const retrievedBlock = buildRetrievedContextBlock(context);
   const checklistBlock = buildMissionChecklistBlock(checklist);
-  const fullSystem =
-    systemPrompt + "\n\n" + retrievedBlock + "\n\n" + checklistBlock + "\n\n" + buildIssueDetectionInstruction(learnerId, addressByName);
+  const fullSystem = systemPrompt + "\n\n" + retrievedBlock + "\n\n" + checklistBlock + "\n\n" + buildIssueDetectionInstruction();
 
   const result = await callJSON(fullSystem, messages);
   console.log(`\n--- ${label} ---`);
-  console.log("has_issue:", result.has_issue);
+  console.log("has_issue:", result.has_issue, "| mistake_type:", result.mistake_type);
   console.log("tutor_line:", result.tutor_line);
   if (result.style_pattern_note) console.log("style_pattern_note:", result.style_pattern_note);
   return result;
@@ -84,139 +81,98 @@ async function main() {
     learnerProfile,
   });
 
-  // --- 민지: enthusiastic/slangy fragment answering a destination question
-  // (mirrors the target example almost exactly) — react to energy first.
-  const minjiMsgs: Anthropic.MessageParam[] = [
-    { role: "assistant", content: "What terminal are you at?" },
-    { role: "user", content: "here ㅋㅋ" },
+  // --- Spelling: exact "'<wrong>' -> '<fixed>'" format, nothing else added.
+  await detect("Spelling (typo)", "B1", empty(), emptyChecklist, [
+    { role: "assistant", content: "Would you like a window or aisle seat?" },
+    { role: "user", content: "widnow seat please" },
+  ]);
+
+  // --- Vocabulary, count 1 then count 3 (tier 2-3) for the SAME learner —
+  // checks the closing-nudge varies between the two, not the same phrase twice.
+  const carrierMsgs: Anthropic.MessageParam[] = [
+    { role: "assistant", content: "Are you checking any bags in today?" },
+    { role: "user", content: "yes, i have one carrier" },
   ];
-  const m1 = await detect("민지 (A2) — enthusiastic fragment, addressByName=true", "A2", "민지", true, empty(), emptyChecklist, minjiMsgs);
-  minjiMsgs.push({ role: "assistant", content: `[튜터]: ${m1.tutor_line}` });
-  minjiMsgs.push({ role: "assistant", content: "London it is! Do you have any bags to check in?" });
-  minjiMsgs.push({ role: "user", content: "I have one bag and I am go with my sister too." });
+  const v1 = await detect("Vocabulary (count 1)", "B1", empty(), emptyChecklist, carrierMsgs);
+  carrierMsgs.push({ role: "assistant", content: `[튜터]: ${v1.tutor_line}` });
+  carrierMsgs.push({ role: "assistant", content: "Got it. And a window or aisle seat?" });
+  carrierMsgs.push({ role: "user", content: "i have one carrier again just to check" });
 
-  // --- 민지 continued: grammar mistake, same session, no name this turn —
-  // checks turn-to-turn variety in both reaction and nudge.
-  await detect("민지 (A2) — grammar, addressByName=false, next turn", "A2", "민지", false, empty(), emptyChecklist, minjiMsgs);
-
-  // --- 지훈: matched pattern count 2 then count 3 (tier 2-3).
-  const droppedAux = { pattern: "dropping the auxiliary verb in questions/statements (e.g. 'I go' instead of 'I'm going')", count: 2 };
-  const jihoonProfile2 = {
-    learner_id: "지훈",
+  const carrierPattern = { pattern: "using 'carrier' to mean a suitcase/bag, instead of the company/person sense", count: 2 };
+  const vocabProfile3: RetrievedContext["learnerProfile"] = {
+    learner_id: "learner",
     level: "B1",
-    weak_expressions: [droppedAux],
+    weak_expressions: [carrierPattern],
     style_patterns: [],
     last_studied_at: null,
     last_session_summary: null,
   };
-  const jihoonContext2: RetrievedContext = {
-    mistakes: [{ id: "m1", text: droppedAux.pattern, metadata: { type: "user_mistake" }, score: 0.9 }],
+  const vocabContext3: RetrievedContext = {
+    mistakes: [{ id: "m1", text: carrierPattern.pattern, metadata: { type: "user_mistake" }, score: 0.9 }],
     utterances: [],
     knowledge: [],
-    learnerProfile: jihoonProfile2,
+    learnerProfile: vocabProfile3,
   };
-  const jihoonMsgs: Anthropic.MessageParam[] = [
+  await detect("Vocabulary (seen 2x before -> tier 2-3, closing nudge should differ from below)", "B1", vocabContext3, emptyChecklist, carrierMsgs);
+
+  // --- Grammar, count 1 then count 4+ (tier 4+) for a different pattern —
+  // separate learner so this run doesn't depend on the above.
+  await detect("Grammar (count 1)", "A2", empty(), emptyChecklist, [
     { role: "assistant", content: "Where are you headed today?" },
-    { role: "user", content: "I go to Paris for vacation." },
-  ];
-  const j1 = await detect(
-    "지훈 (B1) — grammar, seen 2x before (tier 2-3), addressByName=true",
-    "B1",
-    "지훈",
-    true,
-    jihoonContext2,
-    emptyChecklist,
-    jihoonMsgs,
-  );
-  jihoonMsgs.push({ role: "assistant", content: `[튜터]: ${j1.tutor_line}` });
-  jihoonMsgs.push({ role: "assistant", content: "Nice! And how many bags are you checking in today?" });
-  jihoonMsgs.push({ role: "user", content: "I have two bag, one is go over the weight limit I think." });
+    { role: "user", content: "i go to paris for vacation" },
+  ]);
 
-  const jihoonProfile3 = { ...jihoonProfile2, weak_expressions: [{ ...droppedAux, count: 3 }] };
-  const jihoonContext3: RetrievedContext = { ...jihoonContext2, learnerProfile: jihoonProfile3 };
-  await detect(
-    "지훈 (B1) — grammar, seen 3x before (tier 2-3), addressByName=false, next turn",
-    "B1",
-    "지훈",
-    false,
-    jihoonContext3,
-    emptyChecklist,
-    jihoonMsgs,
-  );
-
-  // --- 현우: matched pattern count 5 (tier 4+), with name-address, plus a
-  // paired style_pattern_note.
-  const stronglyRecurring = { pattern: "using 'want' instead of a more polite indirect request form", count: 5 };
-  const overusedGet = { pattern: "overusing the verb 'get' instead of more precise/polite alternatives", count: 3 };
-  const hyunwooProfile = {
-    learner_id: "현우",
-    level: "B2",
-    weak_expressions: [stronglyRecurring],
-    style_patterns: [overusedGet],
+  const dropAuxPattern = { pattern: "dropping the auxiliary verb in questions/statements (e.g. 'I go' instead of 'I'm going')", count: 4 };
+  const grammarProfile4: RetrievedContext["learnerProfile"] = {
+    learner_id: "learner",
+    level: "A2",
+    weak_expressions: [dropAuxPattern],
+    style_patterns: [],
     last_studied_at: null,
     last_session_summary: null,
   };
-  const hyunwooContext: RetrievedContext = {
-    mistakes: [{ id: "m2", text: stronglyRecurring.pattern, metadata: { type: "user_mistake" }, score: 0.9 }],
+  const grammarContext4: RetrievedContext = {
+    mistakes: [{ id: "m2", text: dropAuxPattern.pattern, metadata: { type: "user_mistake" }, score: 0.9 }],
     utterances: [],
     knowledge: [],
-    learnerProfile: hyunwooProfile,
+    learnerProfile: grammarProfile4,
   };
-  const hyunwooMsgs: Anthropic.MessageParam[] = [
-    { role: "assistant", content: "What can I help you with today?" },
-    { role: "user", content: "I want a window seat and I want extra legroom too, can you get that for me." },
-  ];
-  await detect(
-    "현우 (B2) — grammar, seen 5x before (tier 4+), addressByName=true",
-    "B2",
-    "현우",
-    true,
-    hyunwooContext,
-    emptyChecklist,
-    hyunwooMsgs,
-  );
+  await detect("Grammar (seen 4x before -> tier 4+)", "A2", grammarContext4, emptyChecklist, [
+    { role: "assistant", content: "Where are you headed today?" },
+    { role: "user", content: "i go to paris for vacation" },
+  ]);
 
-  // --- Rude/blunt phrasing — checks the softened "무례하게 들릴 수도 있어"
-  // framing instead of any "that's wrong" language.
-  const bluntMsgs: Anthropic.MessageParam[] = [
-    { role: "assistant", content: "Sure, I can help — what would you like?" },
-    { role: "user", content: "Give me window seat now, I don't want to wait." },
-  ];
-  await detect("Mike (B2) — blunt/rude phrasing, addressByName=false", "B2", "Mike", false, empty(), emptyChecklist, bluntMsgs);
+  // --- Unnatural phrasing: bare fragment (soft "~해보자" nudge, no reason needed).
+  await detect("Unnatural phrasing (bare fragment)", "A2", empty(), emptyChecklist, [
+    { role: "assistant", content: "What terminal are you at?" },
+    { role: "user", content: "here" },
+  ]);
 
-  // --- 수아: bare fragment (plain, low-energy) — baseline reaction+nudge
-  // without forced enthusiasm.
-  const suaMsgs: Anthropic.MessageParam[] = [
-    { role: "assistant", content: "What's inside the bag that pushed it over the weight limit?" },
-    { role: "user", content: "stuff" },
-  ];
-  await detect("수아 (A2) — bare fragment (plain), addressByName=false", "A2", "수아", false, empty(), emptyChecklist, suaMsgs);
-
-  // --- 수아 continued: pending situation item glossed over, with name.
+  // --- Unnatural phrasing: pending situation item glossed over — must name the
+  // SPECIFIC situation from the checklist item, not a generic "타이밍이었어" wrapper.
   const situationChecklist: MissionChecklistItem[] = [
     { id: "find_passport", description_ko: "여권을 찾는 데 시간이 걸리는 상황을 설명하기", type: "situation", done: false },
   ];
-  const suaMsgs2: Anthropic.MessageParam[] = [
+  await detect("Unnatural phrasing (situation glossed over)", "A2", empty(), situationChecklist, [
     { role: "assistant", content: "Could I see your passport, please?" },
     { role: "user", content: "um, one second" },
     { role: "assistant", content: "Take your time." },
     { role: "user", content: "here you go" },
-  ];
-  await detect(
-    "수아 (A2) — pending situation item glossed over, addressByName=true",
-    "A2",
-    "수아",
-    true,
-    empty(),
-    situationChecklist,
-    suaMsgs2,
-  );
+  ]);
 
-  // --- Style pattern habit "get", count 2 then count 4 — checks the
-  // warm/playful callout tone (not a verdict) and its tier progression.
+  // --- Unnatural phrasing: grammatically correct but blunt/rude for the
+  // context — checks the softened "무례하게 들릴 수 있어" framing, not a flat
+  // "that's rude" verdict, and no empathy/emoji despite the softer wording.
+  await detect("Unnatural phrasing (blunt/rude, grammatically correct)", "B2", empty(), emptyChecklist, [
+    { role: "assistant", content: "Sure, I can help — what would you like?" },
+    { role: "user", content: "Give me window seat now, I don't want to wait." },
+  ]);
+
+  // --- style_pattern_note, count 2 then count 4+ — checks the dry tone and
+  // varied closing nudge apply here too, matching tutor_line's tiering.
   const overusedGet2 = { pattern: "overusing the verb 'get' instead of more precise/polite alternatives", count: 2 };
-  const styleProfile2 = {
-    learner_id: "지훈",
+  const styleProfile2: RetrievedContext["learnerProfile"] = {
+    learner_id: "learner",
     level: "B1",
     weak_expressions: [],
     style_patterns: [overusedGet2],
@@ -224,19 +180,17 @@ async function main() {
     last_session_summary: null,
   };
   const styleContext2: RetrievedContext = { mistakes: [], utterances: [], knowledge: [], learnerProfile: styleProfile2 };
-  const styleMsgs: Anthropic.MessageParam[] = [
+  await detect("style_pattern_note (count 2)", "B1", styleContext2, emptyChecklist, [
     { role: "assistant", content: "Sure, what would you like to order?" },
     { role: "user", content: "Can I get a coffee, please?" },
-  ];
-  await detect("지훈 (B1) — style pattern 'get', count 2", "B1", "지훈", false, styleContext2, emptyChecklist, styleMsgs);
+  ]);
 
   const styleProfile4 = { ...styleProfile2, style_patterns: [{ ...overusedGet2, count: 4 }] };
   const styleContext4: RetrievedContext = { ...styleContext2, learnerProfile: styleProfile4 };
-  const styleMsgs2: Anthropic.MessageParam[] = [
+  await detect("style_pattern_note (count 4+)", "B1", styleContext4, emptyChecklist, [
     { role: "assistant", content: "Anything else for you?" },
     { role: "user", content: "Can I get the check too?" },
-  ];
-  await detect("지훈 (B1) — style pattern 'get', count 4", "B1", "지훈", false, styleContext4, emptyChecklist, styleMsgs2);
+  ]);
 }
 
 main().catch((err) => {
