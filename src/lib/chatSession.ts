@@ -25,7 +25,7 @@ import {
 } from "./memory.js";
 import { retrieveContext } from "./retrieval.js";
 import { addDocument } from "./vectorstore.js";
-import { writeSessionLog, writeSessionData, type SessionTurn } from "./sessionLog.js";
+import { writeSessionLog, writeSessionData, countScenarioVisits, type SessionTurn } from "./sessionLog.js";
 import { debugLog } from "./debugLog.js";
 import { REFORMAT_NUDGE, requestWithRetry, withReformatNudge } from "./apiRetry.js";
 import { computeLevelAdjustment } from "./levelAdjustment.js";
@@ -75,6 +75,7 @@ interface IssueDetectionResponse {
 interface StaffDialogueResponse {
   staff_line: string;
   scenario_complete: boolean;
+  elicited_pattern: string | null;
 }
 
 interface OpeningResponse {
@@ -88,6 +89,13 @@ interface SessionReportResponse {
   focus_suggestions: string[];
   today_summary: string;
   next_goal: string;
+}
+
+interface TurnRetrievalEntry {
+  turnNumber: number;
+  retrievedWeakExpressions: { pattern: string; count: number }[];
+  staffLine: string;
+  elicitedPattern: string | null;
 }
 
 export interface OpeningResult {
@@ -158,6 +166,7 @@ export class ChatSession {
   // needs for the Anthropic API — built at the point content is generated so
   // writeSessionLog can label speakers reliably instead of re-parsing later.
   private readonly turnLog: SessionTurn[] = [];
+  private readonly turnRetrievalLog: TurnRetrievalEntry[] = [];
   private totalNormalTurns = 0;
   private totalComplexAttempts = 0;
   // Denominator for complexRate — only turns where attempting complex phrasing
@@ -314,6 +323,23 @@ export class ChatSession {
     );
 
     const staffResp = await this.requestStaffDialogue(staffSystemPrompt);
+    const retrievedWeakExpressions = retrieved.mistakes.map((d) => ({
+      pattern: d.text,
+      count: retrieved.learnerProfile?.weak_expressions.find((e) => e.pattern === d.text)?.count ?? 1,
+    }));
+    // Model self-reports elicited_pattern, but nothing stops it from naming a pattern that
+    // wasn't actually retrieved this turn (hallucination, or reporting one from earlier in the
+    // session) — only trust it if it exactly matches one of this turn's own retrieved candidates.
+    const elicitedPattern =
+      staffResp.elicited_pattern !== null && retrieved.mistakes.some((d) => d.text === staffResp.elicited_pattern)
+        ? staffResp.elicited_pattern
+        : null;
+    this.turnRetrievalLog.push({
+      turnNumber: this.totalNormalTurns,
+      retrievedWeakExpressions,
+      staffLine: staffResp.staff_line,
+      elicitedPattern,
+    });
     this.messages.push({
       role: "assistant",
       content: tutorLine ? `[튜터]: ${tutorLine}\n\n${staffResp.staff_line}` : staffResp.staff_line,
@@ -429,6 +455,7 @@ export class ChatSession {
         learner_id: this.learnerId,
         scenario: this.scenario.id,
         session_number: sessionLogResult.sessionNumber,
+        scenario_visit_number: countScenarioVisits(this.learnerId, this.scenario.id) + 1,
         timestamp: new Date().toISOString(),
         level_before: this.learnerProfile.level,
         level_after: levelAdjustment.newLevel,
@@ -447,6 +474,7 @@ export class ChatSession {
         weak_expression_updates_this_session: weakExpressionUpdates,
         style_pattern_updates_this_session: stylePatternUpdates,
         mission_checklist: this.missionChecklist,
+        turnRetrievalLog: this.turnRetrievalLog,
         totalDetectionFailures: this.totalDetectionFailures,
         session_end_type: sessionEndType,
         corrections: this.sessionCorrections,
@@ -715,7 +743,11 @@ export class ChatSession {
       throw new Error("Staff-dialogue response missing staff_line");
     }
 
-    return { staff_line: parsed.staff_line, scenario_complete: parsed.scenario_complete === true };
+    return {
+      staff_line: parsed.staff_line,
+      scenario_complete: parsed.scenario_complete === true,
+      elicited_pattern: typeof parsed.elicited_pattern === "string" ? parsed.elicited_pattern : null,
+    };
   }
 
   private async requestStaffDialogue(turnSystemPrompt: string): Promise<StaffDialogueResponse> {
@@ -723,7 +755,7 @@ export class ChatSession {
       "Staff-dialogue",
       (includeReformatNudge) =>
         this.requestStaffDialogueOnce(turnSystemPrompt, includeReformatNudge ? withReformatNudge(this.messages) : this.messages),
-      () => ({ staff_line: "Sorry, could you say that again?", scenario_complete: false }),
+      () => ({ staff_line: "Sorry, could you say that again?", scenario_complete: false, elicited_pattern: null }),
     );
   }
 

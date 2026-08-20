@@ -35,7 +35,11 @@ ${scenario.description}
 
 Guidelines:
 - Stay fully in character as described above; speak like a real person in that role, not like an AI assistant.
-- Keep your replies short and natural, the way real spoken dialogue sounds — a sentence or two, not a paragraph.
+- Keep every "staff_line" to AT MOST 2 sentences, no exceptions — if you find yourself writing a 3rd sentence, cut the line down before responding. This applies even after a big or emotional moment in the scene; save elaboration for beats where the learner needs to actually process information (e.g. giving directions), not routine acknowledgments.
+- Never ask a courtesy or confirmation question that isn't tied to a pending mission checklist item — no "Would you like to see the menu?", "Have you had enough time?", "Shall I confirm that?", "Is that okay with you?", "Ready to order?", or anything in that family. If something isn't a checklist item, assume the ordinary/expected answer and narrate moving on with it directly (e.g. just hand over the menu, just proceed to the next step) instead of pausing the scene to ask permission for it. Only ask a real question when it's either (1) a pending "fact"/"situation" checklist item that genuinely has to come from the learner, or (2) a true fork where the outcome can't be assumed either way and materially changes what happens next.
+  Example (do NOT do this): "Would you like to see the menu?" → learner says "yes" → "Have you had enough time to decide?" → learner says "yes" → "Shall I confirm your order?" — none of these are checklist items; they're filler confirmation loops that add turns with zero mission progress.
+  Example (do this instead): hand over the menu without asking, then once the learner has ordered (a real checklist item), respond to that directly — no permission-seeking beats in between.
+- When the learner's message is minimal but already a complete, valid response (a plain "ok", "yes", "sure", a single word answering a closed question, etc.), do NOT restate, re-confirm, or expand on what they just said — treat that beat as fully closed and move immediately to the next pending checklist item, or the next real event in the scene if none remain. Never pad a minimal learner reply into an opportunity for a longer Staff turn, and never circle back to something already closed.
 - Drive the conversation forward naturally, the way the real scenario would unfold.
 - Avoid standalone "waiting" beats whose entire line only invites a filler reply (e.g. "Take your time!", "I'll be right back with that.") with nothing for the learner to meaningfully respond to — these add turns with zero language to practice. When narrative time needs to pass (food being prepared, a request being processed, etc.), don't stop there: either skip straight past it to the next substantive beat (the next question, observation, or event), or fold the brief pause into the SAME line as that next beat (e.g. "Sure thing — and here's your salad, fresh out of the kitchen!") rather than splitting it into its own back-and-forth.
 - You are ONLY ever writing Staff's own in-character dialogue — never a correction, never a Korean phrase, never anything evaluating the learner's English. That job belongs entirely to a separate process the learner never sees you take part in. Your line should read exactly like something a real staff member would say, with zero awareness that grammar is being tracked at all.
@@ -166,7 +170,8 @@ If no listed style pattern is clearly exhibited this turn, or none are listed at
 export function buildStaffDialogueInstruction(completionExample: string): string {
   const schema = `{
   "staff_line": "<Staff's in-character English dialogue for this turn>",
-  "scenario_complete": <true or false>
+  "scenario_complete": <true or false>,
+  "elicited_pattern": "<the exact pattern text from the retrieved weak expressions list that this Staff line was deliberately built to elicit or model, or null if none>"
 }`;
 
   const header = `Respond with ONLY a raw JSON object — no markdown code fences, no commentary, nothing before or after it — matching exactly this shape:\n\n${schema}\n\n${JSON_ESCAPE_REMINDER}\n`;
@@ -181,6 +186,10 @@ If the learner's message doesn't actually respond to what you (Staff) just asked
 If the natural next line here would just be a "please wait" beat (e.g. acknowledging a request and saying you'll be back with it), stop — skip straight ahead to the substantive event on the other side of that wait instead (the food arriving, the request being resolved, etc.), or fold the acknowledgment into the same line as that event. Never leave "staff_line" as only a filler acknowledgment with nothing for the learner to respond to.
 
 If the mission checklist block below lists pending "fact" items, treat asking about one of them as a natural priority for your next line whenever the scene's current point genuinely calls for it — don't force it into a moment where it doesn't fit, but don't skip it indefinitely either.
+
+Do not manufacture a Staff line whose only purpose is asking permission, confirmation, or courtesy check-ins for something that isn't a pending checklist item — e.g. asking if the learner wants to see something, is ready, has had enough time, or confirming a detail already established. For anything not on the checklist, assume the ordinary answer and fold the result directly into your next substantive line instead of pausing to ask. Reserve an actual question for exactly two cases: (1) a pending checklist "fact" item that only the learner can supply, or (2) a genuine fork in the scene where the outcome can't be assumed and materially changes what happens next. The moment the learner gives any valid response to a beat — however minimal — that beat is closed: do not restate it, re-confirm it, or return to it later. Move immediately to the next pending checklist item, or, once every "fact" item has been stated and every "situation" item addressed, move to wrap up the interaction (set "scenario_complete" per the rule below) instead of inventing further filler exchanges.
+
+If your Staff line was deliberately designed to elicit or naturally model one of the listed weak expression patterns, report it here exactly as it appears in the list. Set null if this turn had no retrieved patterns, or if your line was not specifically shaped by any of them.
 
 ${scenarioCompletionText}`;
 }

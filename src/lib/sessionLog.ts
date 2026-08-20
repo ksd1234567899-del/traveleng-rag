@@ -26,6 +26,27 @@ export interface SessionLogResult {
 
 const participantsDir = getParticipantsDir();
 
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+// Counts this learner's already-written sessions for a specific scenario id
+// (excludes the in-progress session being finalized, since its .json hasn't
+// been written yet) — used to derive scenario_visit_number: (count + 1) so a
+// second trip to e.g. "airport" can be told apart from the first, distinct
+// from the global session_number in nextSessionNumber above.
+export function countScenarioVisits(learnerId: string, scenarioId: string): number {
+  const participantDir = join(participantsDir, learnerId);
+  let entries: string[];
+  try {
+    entries = readdirSync(participantDir);
+  } catch {
+    return 0;
+  }
+  const pattern = new RegExp(`^session-\\d+-${escapeRegExp(scenarioId)}\\.json$`);
+  return entries.filter((name) => pattern.test(name)).length;
+}
+
 // Scans the participant's own directory rather than tracking a counter
 // anywhere (no DB column, no state file) — stateless, and self-resets to 1
 // after archiveAndReset.ts moves the directory away.
