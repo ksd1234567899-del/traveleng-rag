@@ -29,7 +29,7 @@ async function run(
   const result = await callJSONOnce(systemPrompt);
 
   console.log(`\n=== ${label} ===`);
-  console.log(`오늘 총평: ${result.today_summary}`);
+  console.log(`학습 총평: ${result.today_summary}`);
   console.log(`다음 목표: ${result.next_goal}`);
   console.log("(focus_suggestions for comparison):", result.focus_suggestions);
 }

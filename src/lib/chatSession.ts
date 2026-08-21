@@ -571,10 +571,9 @@ export class ChatSession {
 
     lines.push("📋 오늘의 세션 리포트", divider);
 
-    if (reportResponse?.today_summary || reportResponse?.next_goal) {
+    if (reportResponse?.next_goal) {
       lines.push("");
-      if (reportResponse.today_summary) lines.push(`오늘 총평: ${reportResponse.today_summary}`);
-      if (reportResponse.next_goal) lines.push(`다음 목표: ${reportResponse.next_goal}`);
+      lines.push(`다음 목표: ${reportResponse.next_goal}`);
     }
 
     if (this.missionChecklist.length > 0) {
