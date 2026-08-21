@@ -5,6 +5,7 @@ import cors from "cors";
 import { ChatSession, type SessionReportPayload } from "../lib/chatSession.js";
 import { PretestSession, type PretestReportPayload } from "../lib/pretestSession.js";
 import { learnerExists } from "../lib/memory.js";
+import { getLearnerProgress } from "../lib/progress.js";
 
 const PORT = Number(process.env.PORT ?? 3000);
 // Comma-separated list of allowed origins, or unset for permissive (fine for
@@ -216,6 +217,15 @@ app.get("/session/:sessionId/report", (req: Request, res: Response) => {
     return;
   }
   res.json({ kind: entry.kind, report: entry.session.report });
+});
+
+app.get("/learner/:learnerId/progress", (req: Request, res: Response) => {
+  const progress = getLearnerProgress(req.params.learnerId);
+  if (!progress) {
+    res.status(404).json({ error: "Unknown learnerId" });
+    return;
+  }
+  res.json(progress);
 });
 
 app.listen(PORT, () => {

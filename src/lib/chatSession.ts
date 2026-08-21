@@ -43,6 +43,20 @@ function contentToText(content: Anthropic.MessageParam["content"]): string {
     .join(" ");
 }
 
+// Splits a system prompt into a cacheable prefix + volatile suffix. The prefix
+// (this.systemPrompt) is byte-identical across every call within a session, so
+// a cache_control breakpoint here lets every staff-dialogue/opening call after
+// the first read it instead of paying full price — but only the prefix must
+// stay stable: bundling volatile per-turn content (retrieved context,
+// checklist state) into the SAME string would change the prefix every turn and
+// defeat caching entirely, so it goes in its own uncached trailing block.
+function buildCachedSystem(stablePrefix: string, volatileSuffix: string): Anthropic.TextBlockParam[] {
+  return [
+    { type: "text", text: stablePrefix, cache_control: { type: "ephemeral" } },
+    { type: "text", text: volatileSuffix },
+  ];
+}
+
 function loadScenario(scenarioId: string): Scenario {
   const __dirname = dirname(fileURLToPath(import.meta.url));
   const scenarioPath = join(__dirname, "..", "data", "scenarios", `${scenarioId}.json`);
@@ -209,16 +223,16 @@ export class ChatSession {
     });
 
     const missionElements = pickMissionElements(this.learnerProfile.level, this.scenario.missionElementPool);
-    const turnSystemPrompt =
-      this.systemPrompt +
-      "\n\n" +
+    const turnSystemPrompt = buildCachedSystem(
+      this.systemPrompt,
       buildRetrievedContextBlock(retrieved) +
-      "\n\n" +
-      buildOpeningInstruction(this.learnerProfile.level, missionElements, this.scenario.missionBasics);
+        "\n\n" +
+        buildOpeningInstruction(this.learnerProfile.level, missionElements, this.scenario.missionBasics),
+    );
 
     debugLog(
       this.learnerId,
-      `\n[chat debug] --- final system prompt sent to Claude (learner_id=${this.learnerId}) ---\n${turnSystemPrompt}\n[chat debug] --- end system prompt ---\n`,
+      `\n[chat debug] --- final system prompt sent to Claude (learner_id=${this.learnerId}) ---\n${turnSystemPrompt.map((b) => b.text).join("\n\n")}\n[chat debug] --- end system prompt ---\n`,
     );
     debugLog(
       this.learnerId,
@@ -319,12 +333,14 @@ export class ChatSession {
     // assistant push as staff_line below, never pushed on its own first,
     // otherwise the conversation would end on an assistant turn and the API
     // rejects the next call ("must end with a user message").
-    const staffSystemPrompt =
-      this.systemPrompt + "\n\n" + retrievedContextBlock + "\n\n" + checklistBlock + "\n\n" + buildStaffDialogueInstruction(this.scenario.completionExample);
+    const staffSystemPrompt = buildCachedSystem(
+      this.systemPrompt,
+      retrievedContextBlock + "\n\n" + checklistBlock + "\n\n" + buildStaffDialogueInstruction(this.scenario.completionExample),
+    );
 
     debugLog(
       this.learnerId,
-      `\n[chat debug] --- final system prompt sent to Claude (learner_id=${this.learnerId}, call=staff) ---\n${staffSystemPrompt}\n[chat debug] --- end system prompt ---\n`,
+      `\n[chat debug] --- final system prompt sent to Claude (learner_id=${this.learnerId}, call=staff) ---\n${staffSystemPrompt.map((b) => b.text).join("\n\n")}\n[chat debug] --- end system prompt ---\n`,
     );
     debugLog(
       this.learnerId,
@@ -738,7 +754,7 @@ export class ChatSession {
   }
 
   private async requestStaffDialogueOnce(
-    turnSystemPrompt: string,
+    turnSystemPrompt: Anthropic.TextBlockParam[],
     callMessages: Anthropic.MessageParam[],
   ): Promise<StaffDialogueResponse> {
     const response = await this.client.messages.create({
@@ -766,7 +782,7 @@ export class ChatSession {
     };
   }
 
-  private async requestStaffDialogue(turnSystemPrompt: string): Promise<StaffDialogueResponse> {
+  private async requestStaffDialogue(turnSystemPrompt: Anthropic.TextBlockParam[]): Promise<StaffDialogueResponse> {
     return requestWithRetry(
       "Staff-dialogue",
       (includeReformatNudge) =>
@@ -776,7 +792,7 @@ export class ChatSession {
   }
 
   private async requestOpeningResponseOnce(
-    turnSystemPrompt: string,
+    turnSystemPrompt: Anthropic.TextBlockParam[],
     callMessages: Anthropic.MessageParam[],
   ): Promise<OpeningResponse> {
     const response = await this.client.messages.create({
@@ -812,7 +828,7 @@ export class ChatSession {
     return { mission_briefing: parsed.mission_briefing, staff_line: parsed.staff_line, mission_checklist: checklist };
   }
 
-  private async requestOpeningResponse(turnSystemPrompt: string): Promise<OpeningResponse> {
+  private async requestOpeningResponse(turnSystemPrompt: Anthropic.TextBlockParam[]): Promise<OpeningResponse> {
     return requestWithRetry(
       "Opening response",
       (includeReformatNudge) =>

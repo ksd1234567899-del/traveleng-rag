@@ -159,7 +159,7 @@ export class PretestSession {
     this.messages.push({ role: "assistant", content: reply.partner_line });
 
     if (isLastTurn) {
-      const report = this.finalize();
+      const report = this.finalize("auto");
       return { partnerLine: reply.partner_line, pretestComplete: true, report };
     }
 
@@ -174,10 +174,10 @@ export class PretestSession {
       if (!this.report) throw new Error("Pretest session ended without a report");
       return this.report;
     }
-    return this.finalize();
+    return this.finalize("manual_exit");
   }
 
-  private finalize(): PretestReportPayload {
+  private finalize(sessionEndType: "auto" | "manual_exit"): PretestReportPayload {
     this.ended = true;
 
     const turns: SessionTurn[] = this.messages.slice(1).map((m) => ({
@@ -211,6 +211,7 @@ export class PretestSession {
         totalComplexEligibleTurns: this.complexEligibleTurnCount,
         totalDetectionFailures: this.detectionFailureCount,
         valid_measurement: validMeasurement,
+        session_end_type: sessionEndType,
       });
     }
 
