@@ -17,6 +17,10 @@ function printStyleNote(text: string): void {
   console.log(chalk.magenta(`[튜터 - 스타일]: ${text}`) + "\n");
 }
 
+function printSituationNote(text: string): void {
+  console.log(chalk.magenta(`[튜터 - 상황]: ${text}`) + "\n");
+}
+
 function printMissionLine(text: string): void {
   console.log(chalk.green(`[미션]: ${text}`) + "\n");
 }
@@ -73,6 +77,7 @@ while (!session.ended) {
   const result = await session.sendMessage(userInput);
   if (result.tutorLine) printTutorLine(result.tutorLine);
   if (result.staffLine) printStaffLine(result.staffLine);
+  if (result.situationNote) printSituationNote(result.situationNote);
   if (result.styleNote) printStyleNote(result.styleNote);
   if (result.report) finalReport = result.report;
 }

@@ -70,6 +70,7 @@ interface IssueDetectionResponse {
   attempted_complex_phrasing: boolean;
   complex_phrasing_eligible: boolean;
   style_pattern_note: string | null;
+  situation_guidance_note: string | null;
 }
 
 interface StaffDialogueResponse {
@@ -108,6 +109,7 @@ export interface MessageTurnResult {
   turnNumber: number; // 1-indexed; matches ChatSession.totalNormalTurns at the time this turn was processed
   staffLine: string | null;
   tutorLine: string | null;
+  situationNote: string | null;
   styleNote: string | null;
   scenarioComplete: boolean;
   missionChecklist: MissionChecklistItem[];
@@ -288,8 +290,13 @@ export class ChatSession {
     if (detection.complex_phrasing_eligible) this.totalComplexEligibleTurns += 1;
 
     let tutorLine: string | null = null;
-    // Style notes only ever surface on a turn without a grammar correction —
-    // capped at once per session either way.
+    let situationNote: string | null = null;
+    // Style notes and situation guidance only ever surface on a turn without a grammar
+    // correction — priority is correction > situation guidance > style note, so at most
+    // one Korean note besides staff_line shows per turn. situationNote is deliberately
+    // never pushed into sessionCorrections and has no counter — guidance-only, per design,
+    // never counted as a mistake (there's no cross-session tracking of situation-handling
+    // history to tell a genuine repeat from a first encounter).
     let styleNote: string | null = null;
 
     if (detection.has_issue) {
@@ -300,6 +307,8 @@ export class ChatSession {
         mistakeType: detection.mistake_type as MistakeType,
       });
       tutorLine = detection.tutor_line;
+    } else if (detection.situation_guidance_note) {
+      situationNote = detection.situation_guidance_note;
     } else if (detection.style_pattern_note && !this.styleNoteShownThisSession) {
       this.styleNoteShownThisSession = true;
       styleNote = detection.style_pattern_note;
@@ -359,6 +368,7 @@ export class ChatSession {
       turnNumber: this.totalNormalTurns,
       staffLine: staffResp.staff_line,
       tutorLine,
+      situationNote,
       styleNote,
       scenarioComplete: staffResp.scenario_complete,
       missionChecklist: this.missionChecklist,
@@ -661,6 +671,10 @@ export class ChatSession {
     const complexPhrasingEligible = parsed.complex_phrasing_eligible === true;
     const stylePatternNote =
       typeof parsed.style_pattern_note === "string" && parsed.style_pattern_note.trim() ? parsed.style_pattern_note : null;
+    const situationGuidanceNote =
+      typeof parsed.situation_guidance_note === "string" && parsed.situation_guidance_note.trim()
+        ? parsed.situation_guidance_note
+        : null;
     const validMistakeTypes: MistakeType[] = ["spelling", "vocabulary", "grammar", "unnatural_phrasing"];
     const mistakeType = validMistakeTypes.includes(parsed.mistake_type as MistakeType)
       ? (parsed.mistake_type as MistakeType)
@@ -683,6 +697,7 @@ export class ChatSession {
         attempted_complex_phrasing: attemptedComplexPhrasing,
         complex_phrasing_eligible: complexPhrasingEligible,
         style_pattern_note: stylePatternNote,
+        situation_guidance_note: situationGuidanceNote,
       };
     }
 
@@ -696,6 +711,7 @@ export class ChatSession {
       attempted_complex_phrasing: attemptedComplexPhrasing,
       complex_phrasing_eligible: complexPhrasingEligible,
       style_pattern_note: stylePatternNote,
+      situation_guidance_note: situationGuidanceNote,
     };
   }
 
@@ -716,6 +732,7 @@ export class ChatSession {
           attempted_complex_phrasing: false,
           complex_phrasing_eligible: false,
           style_pattern_note: null,
+          situation_guidance_note: null,
         };
       },
     );

@@ -170,6 +170,7 @@ app.post("/session/message", async (req: Request, res: Response) => {
         turnNumber: result.turnNumber,
         staffLine: result.staffLine,
         tutorLine: result.tutorLine,
+        situationNote: result.situationNote,
         styleNote: result.styleNote,
         scenarioComplete: result.scenarioComplete,
         missionChecklist: result.missionChecklist,
