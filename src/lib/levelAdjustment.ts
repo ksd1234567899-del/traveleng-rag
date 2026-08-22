@@ -6,7 +6,7 @@
 // in a short session doesn't block leveling up, and demotion has a bit more
 // tolerance before firing.
 export const MIN_TURNS_FOR_LEVEL_ADJUSTMENT = 4; // below this, sample too small — skip
-export const RAISE_LEVEL_THRESHOLD = 0.25; // < 25% of turns needed correction -> raise one tier
+export const RAISE_LEVEL_THRESHOLD = 0.4; // < 40% of turns needed correction -> raise one tier
 export const LOWER_LEVEL_THRESHOLD = 0.6; // > 60% of turns needed correction -> lower one tier
 export const LEVELS = ["A2", "B1", "B2"];
 
@@ -20,7 +20,7 @@ export const LEVELS = ["A2", "B1", "B2"];
 // mistake (pushes the learner into harder content prematurely, and this
 // recomputes every session), so earning one should demand more evidence of
 // genuine complexity attempts than merely avoiding a lower requires.
-export const COMPLEX_RAISE_THRESHOLD = 0.6; // raise requires >= 60% of turns attempting complex phrasing
+export const COMPLEX_RAISE_THRESHOLD = 0.5; // raise requires >= 50% of turns attempting complex phrasing
 export const COMPLEX_LOWER_LENIENCY_THRESHOLD = 0.4; // >= 40% attempt rate earns leniency from lowering
 export const LOWER_LEVEL_HARD_THRESHOLD = 0.8; // above this, lower regardless of complexity attempts — too broken to excuse
 
