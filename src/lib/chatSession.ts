@@ -111,6 +111,8 @@ interface TurnRetrievalEntry {
   retrievedWeakExpressions: { pattern: string; count: number }[];
   staffLine: string;
   elicitedPattern: string | null;
+  userUtterance: string;
+  complexEligible: boolean;
 }
 
 export interface OpeningResult {
@@ -364,6 +366,8 @@ export class ChatSession {
       retrievedWeakExpressions,
       staffLine: staffResp.staff_line,
       elicitedPattern,
+      userUtterance: userInput,
+      complexEligible: detection.complex_phrasing_eligible,
     });
     this.messages.push({
       role: "assistant",
